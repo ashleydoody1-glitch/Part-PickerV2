@@ -264,7 +264,7 @@
   <div id="search-modal">
     <div class="search-modal-content">
       <div class="job-modal-header">
-        <h2 class="job-modal-title">ðŸ” Search Part Database</h2>
+        <h2 class="job-modal-title"> Search Part Database</h2>
       </div>
       <div class="prompt-group" style="margin-bottom: 10px;">
         <label for="search-input-box">Search by Part Number or Description (e.g. thermostat)</label>
@@ -303,7 +303,7 @@
   <div id="guide-modal">
     <div class="job-modal-content">
       <div class="job-modal-header">
-        <h2 class="job-modal-title">ðŸ“– Part Picker User Guide</h2>
+        <h2 class="job-modal-title"> Part Picker User Guide</h2>
       </div>
 
       <div class="guide-body">
@@ -311,8 +311,8 @@
 
         <h3>1. Getting Started & Searching</h3>
         <ul>
-          <li><strong>Database Search:</strong> Tap <strong>ðŸ” Search Database</strong> at the top to instantly search your entire history, saved jobs, and templates for terms like "thermostat" or "filter".</li>
-          <li><strong>Camera Scanning:</strong> Tap <strong>ðŸ“· Scan</strong>, point your camera at any 1D barcode or orange shelf label.</li>
+          <li><strong>Database Search:</strong> Tap <strong> Search Database</strong> at the top to instantly search your entire history, saved jobs, and templates for terms like "thermostat" or "filter".</li>
+          <li><strong>Camera Scanning:</strong> Tap <strong> Scan</strong>, point your camera at any 1D barcode or orange shelf label.</li>
         </ul>
 
         <h3>2. Adding Parts & Templates</h3>
@@ -323,7 +323,7 @@
 
         <h3>3. Active List & Terminal Integration</h3>
         <ul>
-          <li><strong>Screen Barcodes:</strong> Open any saved Job Card or Template, tap <strong>ðŸ“± Screen Barcodes</strong>, and zap each large barcode directly off your phone screen using your wireless Zebra scanner.</li>
+          <li><strong>Screen Barcodes:</strong> Open any saved Job Card or Template, tap <strong> Screen Barcodes</strong>, and zap each large barcode directly off your phone screen using your wireless Zebra scanner.</li>
         </ul>
       </div>
 
@@ -342,8 +342,8 @@
       </div>
 
       <div class="job-modal-tabs">
-        <button class="tab-btn active" id="tab-btn-list" onclick="switchJobTab('list')">ðŸ“ Part List</button>
-        <button class="tab-btn" id="tab-btn-barcode" onclick="switchJobTab('barcode')">ðŸ“± Screen Barcodes</button>
+        <button class="tab-btn active" id="tab-btn-list" onclick="switchJobTab('list')"> Part List</button>
+        <button class="tab-btn" id="tab-btn-barcode" onclick="switchJobTab('barcode')"> Screen Barcodes</button>
       </div>
 
       <!-- Tab 1: Standard Part List View -->
@@ -364,9 +364,9 @@
           </div>
           
           <div class="carousel-nav">
-            <button class="btn-carousel" id="carousel-prev" onclick="navigateCarousel(-1)">â—€ Prev</button>
+            <button class="btn-carousel" id="carousel-prev" onclick="navigateCarousel(-1)"> Prev</button>
             <span class="carousel-counter" id="carousel-counter">1 of 5</span>
-            <button class="btn-carousel" id="carousel-next" onclick="navigateCarousel(1)">Next â–¶</button>
+            <button class="btn-carousel" id="carousel-next" onclick="navigateCarousel(1)">Next </button>
           </div>
           
           <div style="font-size: 12px; color: #666; margin-top: 5px; text-align: center;">
@@ -384,10 +384,10 @@
     <h1>Part Picker</h1>
     
     <!-- EMBEDDED USER GUIDE & SEARCH BUTTONS -->
-    <button class="btn-search-top" onclick="openSearchModal()">ðŸ” Search Database</button>
-    <button class="btn-guide-top" onclick="openGuideModal()">ðŸ“– User Guide & Instructions</button>
-      <button class="btn-backup-top" onclick="exportAllData()">ðŸ’¾ Download Full Backup</button>
-      <button class="btn-import-top" onclick="document.getElementById('backup-file-input').click()">ðŸ“¥ Import JSON Backup</button>
+    <button class="btn-search-top" onclick="openSearchModal()"> Search Database</button>
+    <button class="btn-guide-top" onclick="openGuideModal()"> User Guide & Instructions</button>
+      <button class="btn-backup-top" onclick="exportAllData()">Download Full Backup</button>
+      <button class="btn-import-top" onclick="document.getElementById('backup-file-input').click()">Import JSON Backup</button>
       <input id="backup-file-input" type="file" accept="application/json,.json" style="display:none" onchange="importBackupFile(event)">
     
     <div class="input-card" id="input-card">
@@ -403,7 +403,7 @@
         </div>
         <div class="scan-col">
           <label>&nbsp;</label>
-          <button class="btn-scan-trigger" onclick="startScanner()" type="button">ðŸ“· Scan</button>
+          <button class="btn-scan-trigger" onclick="startScanner()" type="button"> Scan</button>
         </div>
       </div>
       
@@ -456,14 +456,14 @@
     <!-- Main Actions -->
     <div id="action-buttons" style="display: none;">
       <button class="btn btn-job-save" onclick="openJobPromptModal('save')">Save to Job Card</button>
-      <button class="btn btn-group-init" onclick="showActiveListBarcodes()">ðŸ“± Screen Barcodes</button>
+      <button class="btn btn-group-init" onclick="showActiveListBarcodes()"> Screen Barcodes</button>
       <button class="btn btn-clear" onclick="clearAllLabels()">Clear Active List</button>
     </div>
 
     <!-- Job Cards Section (Collapsible) -->
     <div class="groups-section job-section" id="jobs-section" style="display: none;">
       <div class="list-header" style="margin-top:0; display:flex; justify-content:space-between; align-items:center; cursor: pointer;" onclick="toggleJobs()">
-        <span id="jobs-title-text">My Saved Job Cards â–¾</span>
+        <span id="jobs-title-text">My Saved Job Cards </span>
         <span style="background: var(--info); color: white; padding: 2px 8px; border-radius: 12px; font-size: 14px;" id="jobs-count-badge">0</span>
       </div>
       <div class="scanned-list" id="jobs-list-container" style="display: none; background: transparent; box-shadow: none; margin-bottom: 0;">
@@ -476,7 +476,7 @@
     <!-- Saved Template Groups Section (Collapsible) -->
     <div class="groups-section" id="groups-section" style="display: none;">
       <div class="list-header" style="margin-top:0; display:flex; justify-content:space-between; align-items:center;">
-        <span id="groups-title-text" onclick="toggleGroups()" style="cursor: pointer; flex-grow: 1;">My Template Groups â–¾</span>
+        <span id="groups-title-text" onclick="toggleGroups()" style="cursor: pointer; flex-grow: 1;">My Template Groups </span>
         <div style="display:flex; align-items:center; gap:8px;">
           <span style="background: var(--primary); color: white; padding: 2px 8px; border-radius: 12px; font-size: 14px;" id="groups-count-badge">0</span>
           <button class="btn-action edit" onclick="saveActiveListAsTemplate()" style="font-weight:bold; border-color:var(--primary); color:var(--primary); padding: 4px 10px;">+ Save Current List</button>
@@ -492,7 +492,7 @@
     <!-- Scan History Section -->
     <div class="groups-section" id="history-section" style="display: none;">
       <div class="list-header" style="margin-top:0; display:flex; justify-content:space-between; align-items:center; cursor: pointer;" onclick="toggleHistory()">
-        <span id="history-title-text">Scan History (Last 25) â–¾</span>
+        <span id="history-title-text">Scan History (Last 25) </span>
         <button class="btn-action remove" onclick="event.stopPropagation(); clearHistory();" style="font-weight:normal; border-color:transparent;">Clear All</button>
       </div>
       <div class="scanned-list" id="history-list" style="display: none;">
@@ -614,7 +614,7 @@
       const historyList = document.getElementById('history-list');
       const titleText = document.getElementById('history-title-text');
       historyList.style.display = historyExpanded ? 'block' : 'none';
-      titleText.innerText = `Scan History (Last 25) ${historyExpanded ? 'â–´' : 'â–¾'}`;
+      titleText.innerText = `Scan History (Last 25) ${historyExpanded ? '' : ''}`;
     }
 
     function toggleJobs() {
@@ -623,7 +623,7 @@
       const jobsListContainer = document.getElementById('jobs-list-container');
       const titleText = document.getElementById('jobs-title-text');
       jobsListContainer.style.display = jobsExpanded ? 'block' : 'none';
-      titleText.innerText = `My Saved Job Cards ${jobsExpanded ? 'â–´' : 'â–¾'}`;
+      titleText.innerText = `My Saved Job Cards ${jobsExpanded ? '' : ''}`;
     }
 
     function toggleGroups() {
@@ -632,7 +632,7 @@
       const groupsListContainer = document.getElementById('groups-list-container');
       const titleText = document.getElementById('groups-title-text');
       groupsListContainer.style.display = groupsExpanded ? 'block' : 'none';
-      titleText.innerText = `My Template Groups ${groupsExpanded ? 'â–´' : 'â–¾'}`;
+      titleText.innerText = `My Template Groups ${groupsExpanded ? '' : ''}`;
     }
 
     // --- DATABASE SEARCH MODAL CONTROLS ---
@@ -698,7 +698,7 @@
         container.innerHTML += `
           <div class="scanned-item">
             <div class="item-part-line">${res.partNo}</div>
-            <div class="item-desc-line">${res.loc ? '<span class="loc-badge">ðŸ“ ' + res.loc + '</span>' : ''} ${res.desc || 'No description'}</div>
+            <div class="item-desc-line">${res.loc ? '<span class="loc-badge"> ' + res.loc + '</span>' : ''} ${res.desc || 'No description'}</div>
             <div class="item-footer-row">
               <span style="font-size: 11px; color: #888;">Database Match</span>
               <div class="item-actions">
@@ -1186,7 +1186,7 @@
       
       items.forEach(item => {
         const oosBadge = item.oos ? '<span class="oos-badge">ON ORDER</span>' : '';
-        const locBadge = item.loc ? `<span class="loc-badge">ðŸ“ ${item.loc}</span>` : '';
+        const locBadge = item.loc ? `<span class="loc-badge"> ${item.loc}</span>` : '';
         const qtyDisplay = (item.qty && item.qty > 1) ? ` <span style="background:#e2e8f0; padding:1px 6px; border-radius:8px; font-size:12px;">x${item.qty}</span>` : '';
         listContainer.innerHTML += `
           <div class="job-modal-item">
@@ -1236,7 +1236,7 @@
       
       const locContainer = document.getElementById('carousel-loc-container');
       if (currentItem.loc) {
-        locContainer.innerHTML = `<span class="carousel-loc" id="carousel-loc">ðŸ“ LOC: ${currentItem.loc}</span>`;
+        locContainer.innerHTML = `<span class="carousel-loc" id="carousel-loc"> LOC: ${currentItem.loc}</span>`;
         locContainer.style.display = 'block';
       } else {
         locContainer.style.display = 'none';
@@ -1377,7 +1377,7 @@
         labels.forEach((label) => {
           const showOosFeature = (contextEditing && contextEditing.type === 'job') || !contextEditing;
           const oosBadge = (showOosFeature && label.oos) ? '<span class="oos-badge">ON ORDER</span>' : '';
-          const locBadge = label.loc ? `<span class="loc-badge">ðŸ“ ${label.loc}</span>` : '';
+          const locBadge = label.loc ? `<span class="loc-badge"> ${label.loc}</span>` : '';
           const oosBtnClass = label.oos ? 'btn-action oos active' : 'btn-action oos';
           const oosBtnText = label.oos ? 'Ordered' : 'On Order';
           const oosButtonHtml = showOosFeature ? `<button class="${oosBtnClass}" onclick="toggleOOS('${label.id}')">${oosBtnText}</button>` : '';
@@ -1415,7 +1415,7 @@
       if(savedJobs.length > 0) {
         jobsSection.style.display = 'block';
         jobsListContainer.style.display = jobsExpanded ? 'block' : 'none';
-        jobsTitleText.innerText = `My Saved Job Cards ${jobsExpanded ? 'â–´' : 'â–¾'}`;
+        jobsTitleText.innerText = `My Saved Job Cards ${jobsExpanded ? '' : ''}`;
         
         jobsList.innerHTML = '';
         savedJobs.forEach(job => {
@@ -1453,7 +1453,7 @@
 
       groupsSection.style.display = 'block';
       groupsListContainer.style.display = groupsExpanded ? 'block' : 'none';
-      groupsTitleText.innerText = `My Template Groups ${groupsExpanded ? 'â–´' : 'â–¾'}`;
+      groupsTitleText.innerText = `My Template Groups ${groupsExpanded ? '' : ''}`;
 
       if(savedGroups.length > 0) {
         groupsList.innerHTML = '';
@@ -1490,7 +1490,7 @@
           historyList.innerHTML += `
             <div class="scanned-item">
               <div class="item-part-line">${hist.partNo}</div>
-              <div class="item-desc-line">${hist.loc ? '<span class="loc-badge">ðŸ“ ' + hist.loc + '</span>' : ''}${hist.desc || 'No description'}</div>
+              <div class="item-desc-line">${hist.loc ? '<span class="loc-badge"> ' + hist.loc + '</span>' : ''}${hist.desc || 'No description'}</div>
               <div class="item-footer-row">
                 <span style="font-size: 11px; color: #888;">${hist.date}</span>
                 <div class="item-actions">
