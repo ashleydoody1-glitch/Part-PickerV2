@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Part Picker | Field Inventory</title>
+  <title>Part Picker</title>
   
   <!-- Standard & Mobile Web App Icons -->
   <link rel="icon" type="image/svg+xml" href="https://api.iconify.design/lucide:box.svg?color=%230056b3">
@@ -48,6 +48,7 @@
       
       .btn-guide-top { background-color: var(--secondary); color: white; border: none; border-radius: 8px; padding: 10px 16px; font-size: 14px; font-weight: bold; cursor: pointer; width: 100%; margin-bottom: 15px; display: flex; align-items: center; justify-content: center; gap: 8px; transition: opacity 0.2s; }
       .btn-guide-top:active { opacity: 0.8; }
+    .environment-header{text-align:center;margin-bottom:18px}.environment-header h1{margin-bottom:8px}.environment-badge{display:inline-block;background:#fff4d6;color:#755100;border:1px solid #e6bf55;border-radius:999px;padding:6px 10px;font-size:11px;font-weight:800;letter-spacing:.06em}.btn-backup-top,.btn-import-top{color:white;border:none;border-radius:8px;padding:10px 16px;font-size:14px;font-weight:bold;cursor:pointer;width:100%;margin-bottom:12px;display:flex;align-items:center;justify-content:center;gap:8px}.btn-backup-top{background-color:var(--success)}.btn-import-top{background-color:var(--warning);color:#111}
 
       .btn-search-top { background-color: var(--info); color: white; border: none; border-radius: 8px; padding: 10px 16px; font-size: 14px; font-weight: bold; cursor: pointer; width: 100%; margin-bottom: 24px; display: flex; align-items: center; justify-content: center; gap: 8px; transition: opacity 0.2s; }
       .btn-search-top:active { opacity: 0.8; }
@@ -234,9 +235,6 @@
       .barcode-wrapper { margin-top: 6px; width: 100%; display: flex; justify-content: center; }
       .barcode-wrapper svg { max-height: 60px; max-width: 100%; }
     }
-
-/* Renovated visual system: original structure and functionality preserved. */
-:root{--primary:#0b5cab;--primary-dark:#074b8d;--secondary:#4f5f70;--success:#18864b;--warning:#e09a13;--danger:#c5353d;--info:#147f99;--bg:#eef3f8;--card-bg:#fff;--text:#142434}body{background:linear-gradient(180deg,#e9f2fc 0,#f5f8fb 310px);color:var(--text)}.app-container{max-width:720px;padding:22px 18px 52px}.brand{display:flex;align-items:center;gap:13px;margin:4px 0 20px}.brand-mark{width:46px;height:46px;border-radius:15px;display:grid;place-items:center;background:linear-gradient(135deg,#0b5cab,#1193ae);color:#fff;font-weight:900;box-shadow:0 8px 20px #0b5cab44}.brand h1{font-size:25px;margin:0;text-align:left;line-height:1.05}.brand p{margin:5px 0 0;color:#607184;font-size:12px;font-weight:600}.quick-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:20px}.quick-action{display:flex;align-items:center;gap:8px;text-align:left;background:#fff;color:#26394b;border:1px solid #dce6ef;box-shadow:0 3px 9px #1a3d5c12;padding:11px 12px;font-size:13px}.quick-primary{background:#e9f3ff;color:#07529b}.quick-success{background:#eaf8ef;color:#126b3a}.quick-warning{background:#fff7e6;color:#895900}.svg-icon{width:19px;height:19px;display:inline-flex;flex:none}.svg-icon svg{width:100%;height:100%;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.input-card,.scanned-list,.group-card{border:1px solid #dce6ef;box-shadow:0 6px 18px #173c5c12;border-radius:16px}.input-card{padding:18px;background:linear-gradient(145deg,#fff,#f9fcff)}input[type=text],input[type=number]{border:1px solid #cbd8e5;border-radius:9px}.btn,.btn-scan-trigger{border-radius:9px}.btn-search-top,.btn-guide-top{display:none}.list-header{font-size:15px;text-transform:uppercase;letter-spacing:.08em;color:#526477;margin-top:27px}.groups-section{border-top:0;padding-top:0}.group-card{padding:14px;background:#fff;border-left:5px solid #0b5cab}.job-card{border-left-color:#147f99}.group-actions{flex-wrap:wrap}.group-actions button{min-width:calc(50% - 4px)}.job-modal-content,.search-modal-content,.prompt-card{border-radius:18px}@media(max-width:420px){.app-container{padding:16px 12px 45px}.quick-grid{gap:7px}.quick-action{font-size:12px;padding:10px 9px}.group-actions button{min-width:100%}}
   </style>
 </head>
 <body>
@@ -266,7 +264,7 @@
   <div id="search-modal">
     <div class="search-modal-content">
       <div class="job-modal-header">
-        <h2 class="job-modal-title"> Search Part Database</h2>
+        <h2 class="job-modal-title">ðŸ” Search Part Database</h2>
       </div>
       <div class="prompt-group" style="margin-bottom: 10px;">
         <label for="search-input-box">Search by Part Number or Description (e.g. thermostat)</label>
@@ -305,7 +303,7 @@
   <div id="guide-modal">
     <div class="job-modal-content">
       <div class="job-modal-header">
-        <h2 class="job-modal-title"> Part Picker User Guide</h2>
+        <h2 class="job-modal-title">ðŸ“– Part Picker User Guide</h2>
       </div>
 
       <div class="guide-body">
@@ -313,8 +311,8 @@
 
         <h3>1. Getting Started & Searching</h3>
         <ul>
-          <li><strong>Database Search:</strong> Tap <strong> Search Database</strong> at the top to instantly search your entire history, saved jobs, and templates for terms like "thermostat" or "filter".</li>
-          <li><strong>Camera Scanning:</strong> Tap <strong> Scan</strong>, point your camera at any 1D barcode or orange shelf label.</li>
+          <li><strong>Database Search:</strong> Tap <strong>ðŸ” Search Database</strong> at the top to instantly search your entire history, saved jobs, and templates for terms like "thermostat" or "filter".</li>
+          <li><strong>Camera Scanning:</strong> Tap <strong>ðŸ“· Scan</strong>, point your camera at any 1D barcode or orange shelf label.</li>
         </ul>
 
         <h3>2. Adding Parts & Templates</h3>
@@ -325,7 +323,7 @@
 
         <h3>3. Active List & Terminal Integration</h3>
         <ul>
-          <li><strong>Screen Barcodes:</strong> Open any saved Job Card or Template, tap <strong> Screen Barcodes</strong>, and zap each large barcode directly off your phone screen using your wireless Zebra scanner.</li>
+          <li><strong>Screen Barcodes:</strong> Open any saved Job Card or Template, tap <strong>ðŸ“± Screen Barcodes</strong>, and zap each large barcode directly off your phone screen using your wireless Zebra scanner.</li>
         </ul>
       </div>
 
@@ -344,8 +342,8 @@
       </div>
 
       <div class="job-modal-tabs">
-        <button class="tab-btn active" id="tab-btn-list" onclick="switchJobTab('list')"> Part List</button>
-        <button class="tab-btn" id="tab-btn-barcode" onclick="switchJobTab('barcode')"> Screen Barcodes</button>
+        <button class="tab-btn active" id="tab-btn-list" onclick="switchJobTab('list')">ðŸ“ Part List</button>
+        <button class="tab-btn" id="tab-btn-barcode" onclick="switchJobTab('barcode')">ðŸ“± Screen Barcodes</button>
       </div>
 
       <!-- Tab 1: Standard Part List View -->
@@ -366,9 +364,9 @@
           </div>
           
           <div class="carousel-nav">
-            <button class="btn-carousel" id="carousel-prev" onclick="navigateCarousel(-1)"> Prev</button>
+            <button class="btn-carousel" id="carousel-prev" onclick="navigateCarousel(-1)">â—€ Prev</button>
             <span class="carousel-counter" id="carousel-counter">1 of 5</span>
-            <button class="btn-carousel" id="carousel-next" onclick="navigateCarousel(1)">Next </button>
+            <button class="btn-carousel" id="carousel-next" onclick="navigateCarousel(1)">Next â–¶</button>
           </div>
           
           <div style="font-size: 12px; color: #666; margin-top: 5px; text-align: center;">
@@ -383,10 +381,14 @@
 
   <!-- MOBILE UI -->
   <div class="app-container">
-    <div class="brand"><div class="brand-mark">PP</div><div><h1>Part Picker</h1><p>Field inventory, job cards and barcode labels</p></div></div>
+    <div class="environment-header"><h1>Part Picker</h1><div class="environment-badge">TEST ENVIRONMENT - SEPARATE DATA</div></div>
     
     <!-- EMBEDDED USER GUIDE & SEARCH BUTTONS -->
-    <div class="quick-grid"><button class="quick-action quick-primary" onclick="openSearchModal()"><span class="svg-icon"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6"></circle><path d="m16 16 5 5"></path></svg></span>Search parts</button><button class="quick-action" onclick="openGuideModal()"><span class="svg-icon"><svg viewBox="0 0 24 24"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v16H6.5A2.5 2.5 0 0 0 4 21.5z"></path><path d="M4 5.5V21"></path></svg></span>How it works</button><button class="quick-action quick-success" onclick="exportAllData()"><span class="svg-icon"><svg viewBox="0 0 24 24"><path d="M12 3v12"></path><path d="m7 10 5 5 5-5"></path><path d="M5 21h14"></path></svg></span>Backup data</button><button class="quick-action quick-warning" onclick="document.getElementById('backup-file-input').click()"><span class="svg-icon"><svg viewBox="0 0 24 24"><path d="M12 21V9"></path><path d="m17 14-5-5-5 5"></path><path d="M5 3h14"></path></svg></span>Import JSON</button></div><input id="backup-file-input" type="file" accept="application/json,.json" style="display:none" onchange="importBackupFile(event)">
+    <button class="btn-search-top" onclick="openSearchModal()">ðŸ” Search Database</button>
+    <button class="btn-guide-top" onclick="openGuideModal()">ðŸ“– User Guide & Instructions</button>
+    <button class="btn-backup-top" onclick="exportAllData()">ðŸ’¾ Download Test Backup</button>
+    <button class="btn-import-top" onclick="document.getElementById('backup-file-input').click()">ðŸ“¥ Import JSON to Test App</button>
+    <input id="backup-file-input" type="file" accept="application/json,.json" style="display:none" onchange="importBackupFile(event)">
     
     <div class="input-card" id="input-card">
       <!-- Top Row: Part Number, Location, Scan Button -->
@@ -401,7 +403,7 @@
         </div>
         <div class="scan-col">
           <label>&nbsp;</label>
-          <button class="btn-scan-trigger" onclick="startScanner()" type="button"> Scan</button>
+          <button class="btn-scan-trigger" onclick="startScanner()" type="button">ðŸ“· Scan</button>
         </div>
       </div>
       
@@ -454,14 +456,14 @@
     <!-- Main Actions -->
     <div id="action-buttons" style="display: none;">
       <button class="btn btn-job-save" onclick="openJobPromptModal('save')">Save to Job Card</button>
-      <button class="btn btn-group-init" onclick="showActiveListBarcodes()"> Screen Barcodes</button>
+      <button class="btn btn-group-init" onclick="showActiveListBarcodes()">ðŸ“± Screen Barcodes</button>
       <button class="btn btn-clear" onclick="clearAllLabels()">Clear Active List</button>
     </div>
 
     <!-- Job Cards Section (Collapsible) -->
     <div class="groups-section job-section" id="jobs-section" style="display: none;">
       <div class="list-header" style="margin-top:0; display:flex; justify-content:space-between; align-items:center; cursor: pointer;" onclick="toggleJobs()">
-        <span id="jobs-title-text">My Saved Job Cards </span>
+        <span id="jobs-title-text">My Saved Job Cards â–¾</span>
         <span style="background: var(--info); color: white; padding: 2px 8px; border-radius: 12px; font-size: 14px;" id="jobs-count-badge">0</span>
       </div>
       <div class="scanned-list" id="jobs-list-container" style="display: none; background: transparent; box-shadow: none; margin-bottom: 0;">
@@ -474,7 +476,7 @@
     <!-- Saved Template Groups Section (Collapsible) -->
     <div class="groups-section" id="groups-section" style="display: none;">
       <div class="list-header" style="margin-top:0; display:flex; justify-content:space-between; align-items:center;">
-        <span id="groups-title-text" onclick="toggleGroups()" style="cursor: pointer; flex-grow: 1;">My Template Groups </span>
+        <span id="groups-title-text" onclick="toggleGroups()" style="cursor: pointer; flex-grow: 1;">My Template Groups â–¾</span>
         <div style="display:flex; align-items:center; gap:8px;">
           <span style="background: var(--primary); color: white; padding: 2px 8px; border-radius: 12px; font-size: 14px;" id="groups-count-badge">0</span>
           <button class="btn-action edit" onclick="saveActiveListAsTemplate()" style="font-weight:bold; border-color:var(--primary); color:var(--primary); padding: 4px 10px;">+ Save Current List</button>
@@ -490,7 +492,7 @@
     <!-- Scan History Section -->
     <div class="groups-section" id="history-section" style="display: none;">
       <div class="list-header" style="margin-top:0; display:flex; justify-content:space-between; align-items:center; cursor: pointer;" onclick="toggleHistory()">
-        <span id="history-title-text">Scan History (Last 25) </span>
+        <span id="history-title-text">Scan History (Last 25) â–¾</span>
         <button class="btn-action remove" onclick="event.stopPropagation(); clearHistory();" style="font-weight:normal; border-color:transparent;">Clear All</button>
       </div>
       <div class="scanned-list" id="history-list" style="display: none;">
@@ -503,6 +505,19 @@
   <div id="print-layout"></div>
 
   <script>
+    // ============================================================
+    // TEST APP ONLY: separate local data from production.
+    // ============================================================
+    const PART_PICKER_STORAGE_PREFIX = 'partPicker:test:v1:';
+    const PART_PICKER_ISOLATED_KEYS = new Set(['savedBarcodeLabels','savedBarcodeGroups','savedJobCards','scanHistoryList','editingContext','historyExpanded','jobsExpanded','groupsExpanded']);
+    function getPartPickerStorageKey(key) { const name = String(key); return PART_PICKER_ISOLATED_KEYS.has(name) ? `${PART_PICKER_STORAGE_PREFIX}${name}` : name; }
+    const originalStorageGetItem = Storage.prototype.getItem;
+    const originalStorageSetItem = Storage.prototype.setItem;
+    const originalStorageRemoveItem = Storage.prototype.removeItem;
+    Storage.prototype.getItem = function(key) { return originalStorageGetItem.call(this, getPartPickerStorageKey(key)); };
+    Storage.prototype.setItem = function(key, value) { return originalStorageSetItem.call(this, getPartPickerStorageKey(key), value); };
+    Storage.prototype.removeItem = function(key) { return originalStorageRemoveItem.call(this, getPartPickerStorageKey(key)); };
+
     let labels = [];
     let savedGroups = [];
     let savedJobs = [];
@@ -519,10 +534,42 @@
     let jobsExpanded = JSON.parse(localStorage.getItem('jobsExpanded')) || false;
     let groupsExpanded = JSON.parse(localStorage.getItem('groupsExpanded')) || false;
 
-    const PART_PICKER_BACKUP_KEYS=['savedBarcodeLabels','savedBarcodeGroups','savedJobCards','scanHistoryList','editingContext','historyExpanded','jobsExpanded','groupsExpanded'];
-    function safeParseStoredValue(key,fallback){try{const v=localStorage.getItem(key);return v===null?fallback:JSON.parse(v)}catch(error){console.error(error);return fallback}}
-    function exportAllData(){try{const b={app:'Part Picker',backupVersion:1,exportedAt:new Date().toISOString(),data:{savedBarcodeLabels:safeParseStoredValue('savedBarcodeLabels',[]),savedBarcodeGroups:safeParseStoredValue('savedBarcodeGroups',[]),savedJobCards:safeParseStoredValue('savedJobCards',[]),scanHistoryList:safeParseStoredValue('scanHistoryList',[]),editingContext:safeParseStoredValue('editingContext',null),historyExpanded:safeParseStoredValue('historyExpanded',false),jobsExpanded:safeParseStoredValue('jobsExpanded',false),groupsExpanded:safeParseStoredValue('groupsExpanded',false)}};const blob=new Blob([JSON.stringify(b,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=`part-picker-backup-${new Date().toISOString().replace(/[:.]/g,'-')}.json`;document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url);showNotification('Backup downloaded successfully.')}catch(e){console.error(e);showNotification('Backup failed.')}}
-    function importBackupFile(event){const input=event.target,file=input.files&&input.files[0];input.value='';if(!file)return;if(file.size>10485760)return showNotification('Backup file is too large.');const reader=new FileReader();reader.onerror=()=>showNotification('Could not read that file.');reader.onload=()=>{let d;try{const b=JSON.parse(reader.result);if(!b||!b.data||typeof b.data!=='object')throw new Error('Invalid Part Picker backup.');d=b.data;for(const k of ['savedBarcodeLabels','savedBarcodeGroups','savedJobCards','scanHistoryList'])if(d[k]!==undefined&&!Array.isArray(d[k]))throw new Error(`Invalid ${k} data.`)}catch(e){showNotification(e.message||'Invalid backup file.');return}const count=(d.savedBarcodeLabels||[]).length+(d.savedBarcodeGroups||[]).length+(d.savedJobCards||[]).length+(d.scanHistoryList||[]).length;showCustomConfirm(`Import this backup? ${count} saved records will replace data in this browser.`,()=>{try{for(const k of PART_PICKER_BACKUP_KEYS)Object.prototype.hasOwnProperty.call(d,k)?localStorage.setItem(k,JSON.stringify(d[k])):localStorage.removeItem(k);showNotification('Backup imported. Reloading...');setTimeout(()=>location.reload(),700)}catch(e){showNotification('Import failed.')}})};reader.readAsText(file)}
+    // ============================================================
+    // TEST BACKUP EXPORT / IMPORT
+    // The storage wrapper above automatically keeps these in TEST.
+    // ============================================================
+    const PART_PICKER_BACKUP_KEYS = ['savedBarcodeLabels','savedBarcodeGroups','savedJobCards','scanHistoryList','editingContext','historyExpanded','jobsExpanded','groupsExpanded'];
+    function stored(key, fallback) { try { const value=localStorage.getItem(key); return value===null ? fallback : JSON.parse(value); } catch(error) { console.error(error); return fallback; } }
+    function exportAllData() {
+      try {
+        const backup={app:'Part Picker',environment:'test',backupVersion:1,exportedAt:new Date().toISOString(),data:{savedBarcodeLabels:stored('savedBarcodeLabels',[]),savedBarcodeGroups:stored('savedBarcodeGroups',[]),savedJobCards:stored('savedJobCards',[]),scanHistoryList:stored('scanHistoryList',[]),editingContext:stored('editingContext',null),historyExpanded:stored('historyExpanded',false),jobsExpanded:stored('jobsExpanded',false),groupsExpanded:stored('groupsExpanded',false)}};
+        const blob=new Blob([JSON.stringify(backup,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),link=document.createElement('a');
+        link.href=url; link.download=`part-picker-test-backup-${new Date().toISOString().replace(/[:.]/g,'-')}.json`; document.body.appendChild(link); link.click(); link.remove(); URL.revokeObjectURL(url);
+        showNotification('Test backup downloaded successfully.');
+      } catch(error) { console.error(error); showNotification('Backup failed.'); }
+    }
+    function importBackupFile(event) {
+      const input=event.target, file=input.files && input.files[0]; input.value='';
+      if(!file) return;
+      if(file.size>10*1024*1024) { showNotification('Backup file is too large. Maximum size is 10 MB.'); return; }
+      const reader=new FileReader();
+      reader.onerror=()=>showNotification('Could not read that backup file.');
+      reader.onload=()=>{
+        let data;
+        try {
+          const backup=JSON.parse(reader.result);
+          if(!backup || !backup.data || typeof backup.data!=='object') throw new Error('This is not a valid Part Picker backup.');
+          data=backup.data;
+          for(const key of ['savedBarcodeLabels','savedBarcodeGroups','savedJobCards','scanHistoryList']) if(data[key]!==undefined && !Array.isArray(data[key])) throw new Error(`Invalid ${key} data.`);
+        } catch(error) { console.error(error); showNotification(error.message || 'Invalid backup file.'); return; }
+        const count=(data.savedBarcodeLabels||[]).length+(data.savedBarcodeGroups||[]).length+(data.savedJobCards||[]).length+(data.scanHistoryList||[]).length;
+        showCustomConfirm(`Import this backup into TEST? ${count} saved records will replace only the test app data. Production data will not change.`,()=>{
+          try { for(const key of PART_PICKER_BACKUP_KEYS) Object.prototype.hasOwnProperty.call(data,key) ? localStorage.setItem(key,JSON.stringify(data[key])) : localStorage.removeItem(key); showNotification('Backup imported into test. Reloading...'); setTimeout(()=>location.reload(),700); }
+          catch(error) { console.error(error); showNotification('Import failed.'); }
+        });
+      };
+      reader.readAsText(file);
+    }
 
     // Toast Notification helper
     function showNotification(msg) {
@@ -610,7 +657,7 @@
       const historyList = document.getElementById('history-list');
       const titleText = document.getElementById('history-title-text');
       historyList.style.display = historyExpanded ? 'block' : 'none';
-      titleText.innerText = `Scan History (Last 25) ${historyExpanded ? '' : ''}`;
+      titleText.innerText = `Scan History (Last 25) ${historyExpanded ? 'â–´' : 'â–¾'}`;
     }
 
     function toggleJobs() {
@@ -619,7 +666,7 @@
       const jobsListContainer = document.getElementById('jobs-list-container');
       const titleText = document.getElementById('jobs-title-text');
       jobsListContainer.style.display = jobsExpanded ? 'block' : 'none';
-      titleText.innerText = `My Saved Job Cards ${jobsExpanded ? '' : ''}`;
+      titleText.innerText = `My Saved Job Cards ${jobsExpanded ? 'â–´' : 'â–¾'}`;
     }
 
     function toggleGroups() {
@@ -628,7 +675,7 @@
       const groupsListContainer = document.getElementById('groups-list-container');
       const titleText = document.getElementById('groups-title-text');
       groupsListContainer.style.display = groupsExpanded ? 'block' : 'none';
-      titleText.innerText = `My Template Groups ${groupsExpanded ? '' : ''}`;
+      titleText.innerText = `My Template Groups ${groupsExpanded ? 'â–´' : 'â–¾'}`;
     }
 
     // --- DATABASE SEARCH MODAL CONTROLS ---
@@ -694,7 +741,7 @@
         container.innerHTML += `
           <div class="scanned-item">
             <div class="item-part-line">${res.partNo}</div>
-            <div class="item-desc-line">${res.loc ? '<span class="loc-badge"> ' + res.loc + '</span>' : ''} ${res.desc || 'No description'}</div>
+            <div class="item-desc-line">${res.loc ? '<span class="loc-badge">ðŸ“ ' + res.loc + '</span>' : ''} ${res.desc || 'No description'}</div>
             <div class="item-footer-row">
               <span style="font-size: 11px; color: #888;">Database Match</span>
               <div class="item-actions">
@@ -1182,7 +1229,7 @@
       
       items.forEach(item => {
         const oosBadge = item.oos ? '<span class="oos-badge">ON ORDER</span>' : '';
-        const locBadge = item.loc ? `<span class="loc-badge"> ${item.loc}</span>` : '';
+        const locBadge = item.loc ? `<span class="loc-badge">ðŸ“ ${item.loc}</span>` : '';
         const qtyDisplay = (item.qty && item.qty > 1) ? ` <span style="background:#e2e8f0; padding:1px 6px; border-radius:8px; font-size:12px;">x${item.qty}</span>` : '';
         listContainer.innerHTML += `
           <div class="job-modal-item">
@@ -1232,7 +1279,7 @@
       
       const locContainer = document.getElementById('carousel-loc-container');
       if (currentItem.loc) {
-        locContainer.innerHTML = `<span class="carousel-loc" id="carousel-loc"> LOC: ${currentItem.loc}</span>`;
+        locContainer.innerHTML = `<span class="carousel-loc" id="carousel-loc">ðŸ“ LOC: ${currentItem.loc}</span>`;
         locContainer.style.display = 'block';
       } else {
         locContainer.style.display = 'none';
@@ -1373,7 +1420,7 @@
         labels.forEach((label) => {
           const showOosFeature = (contextEditing && contextEditing.type === 'job') || !contextEditing;
           const oosBadge = (showOosFeature && label.oos) ? '<span class="oos-badge">ON ORDER</span>' : '';
-          const locBadge = label.loc ? `<span class="loc-badge"> ${label.loc}</span>` : '';
+          const locBadge = label.loc ? `<span class="loc-badge">ðŸ“ ${label.loc}</span>` : '';
           const oosBtnClass = label.oos ? 'btn-action oos active' : 'btn-action oos';
           const oosBtnText = label.oos ? 'Ordered' : 'On Order';
           const oosButtonHtml = showOosFeature ? `<button class="${oosBtnClass}" onclick="toggleOOS('${label.id}')">${oosBtnText}</button>` : '';
@@ -1411,7 +1458,7 @@
       if(savedJobs.length > 0) {
         jobsSection.style.display = 'block';
         jobsListContainer.style.display = jobsExpanded ? 'block' : 'none';
-        jobsTitleText.innerText = `My Saved Job Cards ${jobsExpanded ? '' : ''}`;
+        jobsTitleText.innerText = `My Saved Job Cards ${jobsExpanded ? 'â–´' : 'â–¾'}`;
         
         jobsList.innerHTML = '';
         savedJobs.forEach(job => {
@@ -1449,7 +1496,7 @@
 
       groupsSection.style.display = 'block';
       groupsListContainer.style.display = groupsExpanded ? 'block' : 'none';
-      groupsTitleText.innerText = `My Template Groups ${groupsExpanded ? '' : ''}`;
+      groupsTitleText.innerText = `My Template Groups ${groupsExpanded ? 'â–´' : 'â–¾'}`;
 
       if(savedGroups.length > 0) {
         groupsList.innerHTML = '';
@@ -1486,7 +1533,7 @@
           historyList.innerHTML += `
             <div class="scanned-item">
               <div class="item-part-line">${hist.partNo}</div>
-              <div class="item-desc-line">${hist.loc ? '<span class="loc-badge"> ' + hist.loc + '</span>' : ''}${hist.desc || 'No description'}</div>
+              <div class="item-desc-line">${hist.loc ? '<span class="loc-badge">ðŸ“ ' + hist.loc + '</span>' : ''}${hist.desc || 'No description'}</div>
               <div class="item-footer-row">
                 <span style="font-size: 11px; color: #888;">${hist.date}</span>
                 <div class="item-actions">
