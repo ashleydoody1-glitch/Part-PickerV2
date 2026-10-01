@@ -1,755 +1,449 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Dual Keg Tracker</title>
-<!-- Supabase JS -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js/dist/umd/supabase.min.js"></script>
-<style>
-  /* Keep your existing CSS here */
-  :root {
-    --amber: #f4a261;
-    --gold: #e9c46a;
-    --brown-dark: #6a4c3b;
-    --brown-light: #dccaaf;
-    --red-warm: #d9534f;
-    --orange-warm: #f08a5d;
-    --background: #f7ede2;
-    --surface: #fff5e1;
-    --text-dark: #402218;
-  }
-  body {
-    margin: 0;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: var(--background);
-    color: var(--text-dark);
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-  }
-  header {
-    background: var(--amber);
-    padding: 1rem 0;
-    text-align: center;
-    color: var(--brown-dark);
-    font-weight: 700;
-    font-size: 1.8rem;
-    user-select: none;
-  }
-  .summary {
-    margin: 1rem 0;
-    text-align: center;
-    font-weight: 600;
-    font-size: 1.1rem;
-    color: var(--brown-dark);
-  }
-  .kegs-container {
-    max-width: 900px;
-    margin: 0 auto;
-    display: flex;
-    gap: 2rem;
-    padding: 0 1rem 2rem;
-    justify-content: center;
-    flex-wrap: wrap;
-  }
-  .keg-section {
-    background: var(--surface);
-    border-radius: 12px;
-    box-shadow: 0 2px 10px rgb(0 0 0 / 0.1);
-    padding: 1.2rem 1.5rem;
-    flex: 1 1 320px;
-    display: flex;
-    flex-direction: column;
-    user-select: none;
-  }
-  .keg-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1rem;
-  }
-  .keg-header h2 {
-    margin: 0;
-    font-size: 1.6rem;
-    color: var(--brown-dark);
-  }
-  .keg-status {
-    font-weight: 700;
-    font-size: 1rem;
-    padding: 0.25rem 0.75rem;
-    border-radius: 20px;
-    user-select: none;
-    white-space: nowrap;
-  }
-  .keg-status.Ready {
-    background-color: var(--gold);
-    color: var(--brown-dark);
-  }
-  .keg-status.warning {
-    background-color: var(--orange-warm);
-    color: white;
-  }
-  .keg-status.error {
-    background-color: var(--red-warm);
-    color: white;
-  }
-  .keg-display {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    margin-bottom: 1.3rem;
-  }
-  .remaining-display {
-    flex-grow: 1;
-  }
-  .remaining-amount {
-    font-size: 2.6rem;
-    font-weight: 700;
-    letter-spacing: 0.05em;
-    color: var(--brown-dark);
-  }
-  .progress-container {
-    flex-basis: 90px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-  .progress-bar {
-    width: 90px;
-    height: 90px;
-    border-radius: 50%;
-    background: conic-gradient(
-      var(--amber) 0% var(--progress),
-      var(--brown-light) var(--progress) 100%
-    );
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 8px;
-  }
-  .progress-bar::after {
-    content: "";
-    position: absolute;
-    top: 10px; left: 10px;
-    width: 70px; height: 70px;
-    background: var(--surface);
-    border-radius: 50%;
-    z-index: 0;
-  }
-  .progress-text {
-    position: absolute;
-    top: 50%; left: 50%;
-    transform: translate(-50%, -50%);
-    font-weight: 700;
-    font-size: 1.2rem;
-    color: var(--brown-dark);
-    z-index: 1;
-    pointer-events: none;
-  }
-  .consumed-display {
-    margin-bottom: 1rem;
-    font-weight: 600;
-    color: var(--brown-dark);
-    font-size: 1.1rem;
-  }
-  .consumed-label {
-    font-weight: 700;
-    margin-right: 0.25rem;
-  }
-  .pour-buttons {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.7rem;
-    justify-content: center;
-  }
-  .pour-btn {
-    padding: 0.65rem 1.2rem;
-    font-weight: 700;
-    border-radius: 8px;
-    border: none;
-    cursor: pointer;
-    color: white;
-    font-size: 1rem;
-    flex: 1 1 48%;
-    transition: transform 0.15s ease;
-    user-select: none;
-  }
-  .pour-btn:hover {
-    transform: scale(1.1);
-  }
-  .pour-btn[data-amount="330"] { background-color: #dd6b20; }
-  .pour-btn[data-amount="425"] { background-color: #d97706; }
-  .pour-btn[data-amount="500"] { background-color: #b45309; }
-  .pour-btn[data-amount="570"] { background-color: #92400e; }
-  .pour-btn[data-amount="1000"] { background-color: #78350f; }
-  .pour-btn[data-amount="other"] { background-color: #4a2c0a; }
-  .pour-btn:active { transform: scale(0.95); }
-  .btn-reset {
-    margin-top: 1rem;
-    background-color: var(--brown-dark);
-    color: var(--surface);
-    font-weight: 700;
-    padding: 0.6rem;
-    border-radius: 8px;
-    border: none;
-    cursor: pointer;
-    user-select: none;
-    transition: background-color 0.2s ease;
-  }
-  .btn-reset:hover { background-color: #5c3a16; }
-  .modal-backdrop {
-    position: fixed;
-    inset: 0;
-    background-color: rgba(0, 0, 0, 0.35);
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.3s ease;
-    z-index: 999;
-  }
-  .modal-backdrop.open { opacity: 1; pointer-events: auto; }
-  .modal {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: var(--surface);
-    padding: 1.5rem 1.8rem;
-    border-radius: 10px;
-    box-shadow: 0 4px 14px rgba(0,0,0,0.2);
-    width: 320px;
-    max-width: 90vw;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.3s ease;
-    z-index: 1000;
-    user-select: none;
-  }
-  .modal.open { opacity: 1; pointer-events: auto; }
-  .modal h3 { margin: 0 0 1rem 0; color: var(--brown-dark); font-weight: 700; }
-  .modal input {
-    width: 100%;
-    font-size: 1.2rem;
-    padding: 0.5rem 0.75rem;
-    border: 2px solid var(--amber);
-    border-radius: 6px;
-    outline-offset: 2px;
-    margin-bottom: 1rem;
-  }
-  .modal input:focus { border-color: var(--brown-dark); }
-  .modal-buttons { text-align: right; }
-  .modal-buttons button {
-    background-color: var(--brown-dark);
-    color: var(--surface);
-    font-weight: 700;
-    border: none;
-    padding: 0.5rem 1rem;
-    margin-left: 0.6rem;
-    border-radius: 6px;
-    cursor: pointer;
-    user-select: none;
-    transition: background-color 0.25s ease;
-  }
-  .modal-buttons button:disabled { opacity: 0.5; cursor: not-allowed; }
-  .modal-buttons button:hover:not(:disabled) { background-color: #5c3a16; }
-  .modal-warning {
-    color: var(--red-warm);
-    font-weight: 600;
-    font-size: 0.9rem;
-    margin-top: -0.8rem;
-    margin-bottom: 1rem;
-    display: none;
-  }
+From: <Saved by Blink>
+Snapshot-Content-Location: https://d2z0o16i8xm8ak.cloudfront.net/web/direct-files/e6b6a8140de8a9bc330edcc9cf8881e4/fc3b7f74-3a6b-4b09-8241-f64ab2c3504a/ab2a726b.html?response-content-disposition=attachment%3B+filename%3D%22part-picker-test-with-backup-import.html%22%3B+filename%2A%3DUTF-8%27%27part-picker-test-with-backup-import.html&Policy=eyJTdGF0ZW1lbnQiOlt7IlJlc291cmNlIjoiaHR0cHM6Ly9kMnowbzE2aTh4bThhay5jbG91ZGZyb250Lm5ldC93ZWIvZGlyZWN0LWZpbGVzL2U2YjZhODE0MGRlOGE5YmMzMzBlZGNjOWNmODg4MWU0L2ZjM2I3Zjc0LTNhNmItNGIwOS04MjQxLWY2NGFiMmMzNTA0YS9hYjJhNzI2Yi5odG1sP3Jlc3BvbnNlLWNvbnRlbnQtZGlzcG9zaXRpb249YXR0YWNobWVudCUzQitmaWxlbmFtZSUzRCUyMnBhcnQtcGlja2VyLXRlc3Qtd2l0aC1iYWNrdXAtaW1wb3J0Lmh0bWwlMjIlM0IrZmlsZW5hbWUlMkElM0RVVEYtOCUyNyUyN3BhcnQtcGlja2VyLXRlc3Qtd2l0aC1iYWNrdXAtaW1wb3J0Lmh0bWwqIiwiQ29uZGl0aW9uIjp7IkRhdGVMZXNzVGhhbiI6eyJBV1M6RXBvY2hUaW1lIjoxNzkxNDQ4MjU2fX19XX0_&Signature=QwjQyFhylm9l1IJa2LHB2mBfUq2jDLy8ZJ5bBKTL1JURjiiWjctly5Wm~AZyzQl3AAPsCXrEy-JwXJuDKwkUtI-2lAROHSMgQkQJvj~G1MDXnpI0VvVlwraXfQve6BOvX-Tls9tElvc2lXfTWCRQWWtVgeSwRTJgecTlwPFPi2orxVh0Q-5jQ7bRf4fFD~wPFHatF5SQ2UTjGwNFGA24LTHBwb73~A45jz1gsxVpXEYRnc6-rSnbBT6s~3-h4wQQItxTf~GFzeKY9jQ9LSvVpGfBKZz4K3MD57j8VkiEhHY~AB0qe5yYcaPCOTOnbfpgnD5e~QfYQT~s6ubjQHO40A__&Key-Pair-Id=K1BF7XGXAIMYNX
+Subject: Part Picker
+Date: Thu, 01 Oct 2026 08:31:59 GMT
+MIME-Version: 1.0
+Content-Type: multipart/related;
+	type="text/html";
+	boundary="----MultipartBoundary--yiKahtgz02vEcBUc2XVlkK30HGJMsYO0N7UVWJwUCH----"
+
+
+------MultipartBoundary--yiKahtgz02vEcBUc2XVlkK30HGJMsYO0N7UVWJwUCH----
+Content-Type: text/html
+Content-ID: <frame-091C1D21A6D210BC09106744D44F68BD@mhtml.blink>
+Content-Transfer-Encoding: binary
+Content-Location: https://d2z0o16i8xm8ak.cloudfront.net/web/direct-files/e6b6a8140de8a9bc330edcc9cf8881e4/fc3b7f74-3a6b-4b09-8241-f64ab2c3504a/ab2a726b.html?response-content-disposition=attachment%3B+filename%3D%22part-picker-test-with-backup-import.html%22%3B+filename%2A%3DUTF-8%27%27part-picker-test-with-backup-import.html&Policy=eyJTdGF0ZW1lbnQiOlt7IlJlc291cmNlIjoiaHR0cHM6Ly9kMnowbzE2aTh4bThhay5jbG91ZGZyb250Lm5ldC93ZWIvZGlyZWN0LWZpbGVzL2U2YjZhODE0MGRlOGE5YmMzMzBlZGNjOWNmODg4MWU0L2ZjM2I3Zjc0LTNhNmItNGIwOS04MjQxLWY2NGFiMmMzNTA0YS9hYjJhNzI2Yi5odG1sP3Jlc3BvbnNlLWNvbnRlbnQtZGlzcG9zaXRpb249YXR0YWNobWVudCUzQitmaWxlbmFtZSUzRCUyMnBhcnQtcGlja2VyLXRlc3Qtd2l0aC1iYWNrdXAtaW1wb3J0Lmh0bWwlMjIlM0IrZmlsZW5hbWUlMkElM0RVVEYtOCUyNyUyN3BhcnQtcGlja2VyLXRlc3Qtd2l0aC1iYWNrdXAtaW1wb3J0Lmh0bWwqIiwiQ29uZGl0aW9uIjp7IkRhdGVMZXNzVGhhbiI6eyJBV1M6RXBvY2hUaW1lIjoxNzkxNDQ4MjU2fX19XX0_&Signature=QwjQyFhylm9l1IJa2LHB2mBfUq2jDLy8ZJ5bBKTL1JURjiiWjctly5Wm~AZyzQl3AAPsCXrEy-JwXJuDKwkUtI-2lAROHSMgQkQJvj~G1MDXnpI0VvVlwraXfQve6BOvX-Tls9tElvc2lXfTWCRQWWtVgeSwRTJgecTlwPFPi2orxVh0Q-5jQ7bRf4fFD~wPFHatF5SQ2UTjGwNFGA24LTHBwb73~A45jz1gsxVpXEYRnc6-rSnbBT6s~3-h4wQQItxTf~GFzeKY9jQ9LSvVpGfBKZz4K3MD57j8VkiEhHY~AB0qe5yYcaPCOTOnbfpgnD5e~QfYQT~s6ubjQHO40A__&Key-Pair-Id=K1BF7XGXAIMYNX
+
+<!DOCTYPE html><html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><link rel="stylesheet" type="text/css" href="cid:css-5969cb9a-42e7-4c91-a38f-0a17d50d85da@mhtml.blink" />
   
-  /* New styles for confirmation modal content */
-  .modal-message {
-    margin-bottom: 1.5rem;
-    font-size: 1rem;
-    line-height: 1.4;
-    color: var(--text-dark);
-  }
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Part Picker</title>
   
-  .history-section {
-    max-width: 900px;
-    margin: 2rem auto;
-    background: var(--surface);
-    border-radius: 12px;
-    padding: 1rem;
-  }
-  .history-section div {
-    padding: 0.5rem 0;
-    border-bottom: 1px solid var(--brown-light);
-  }
-  .history-note {
-    font-style: italic;
-    color: var(--brown-dark);
-    margin-left: 5px;
-  }
-  @media (max-width: 720px) {
-    .kegs-container { flex-direction: column; padding-bottom: 3rem; }
-    .keg-section { max-width: 420px; margin: 0 auto 1.5rem; }
-    .pour-btn { flex: 1 1 100%; }
-  }
-</style>
+  <!-- Standard & Mobile Web App Icons -->
+  <link rel="icon" type="image/svg+xml" href="https://api.iconify.design/lucide:box.svg?color=%230056b3">
+  <link rel="apple-touch-icon" href="https://api.iconify.design/lucide:box.svg?color=%230056b3">
+  
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="data:application/manifest+json,{&quot;name&quot;:&quot;Part Picker&quot;,&quot;short_name&quot;:&quot;PartPicker&quot;,&quot;start_url&quot;:&quot;.&quot;,&quot;display&quot;:&quot;standalone&quot;,&quot;background_color&quot;:&quot;#f4f7f6%22,%22theme_color%22:%22#0056b3%22,%22icons%22:[{%22src%22:%22https://api.iconify.design/lucide:box.svg?color=%230056b3%22,%22sizes%22:%22192x192%22,%22type%22:%22image/svg+xml%22}]}">
+  <meta name="theme-color" content="#0056b3">
+
+  <!-- JsBarcode for generating A4 print sheets and screen barcodes -->
+  
+  <!-- Html5-Qrcode for scanning barcodes via camera -->
+  
+  
+  
 </head>
 <body>
-<header>🍺 Dual Keg Tracker</header>
-<div class="summary" aria-live="polite" aria-atomic="true">
-  Total Remaining: <span id="total-remaining">0.00L</span> &nbsp;|&nbsp; Total Consumed: <span id="total-consumed">0.00L</span>
-</div>
-<div class="kegs-container">
-  <section class="keg-section" id="keg-a" aria-label="Tap A">
-    <div class="keg-header">
-      <h2>Tap A</h2>
-      <div class="keg-status Ready" id="status-a">Loading...</div>
-    </div>
-    <div class="keg-display">
-      <div class="remaining-display" aria-live="polite" aria-atomic="true"><span class="remaining-amount" id="remaining-a">0.00</span>L remaining</div>
-      <div class="progress-container">
-        <div class="progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="progress-bar-a" style="--progress:0%;">
-          <span class="progress-text" id="progress-text-a">0%</span>
-        </div>
+
+  <!-- TOAST NOTIFICATION CONTAINER -->
+  <div id="toast-notification">Notification message</div>
+
+  <!-- CAMERA SCANNER MODAL -->
+  <div id="scanner-modal">
+    <div id="reader"></div>
+    <button class="btn-close-scanner">Cancel Scan</button>
+  </div>
+
+  <!-- IN-APP CUSTOM CONFIRMATION MODAL -->
+  <div id="custom-confirm-modal">
+    <div class="prompt-card">
+      <h3 class="prompt-title" id="confirm-modal-title">Confirm Action</h3>
+      <p id="confirm-modal-message" style="margin: 0; font-size: 14px; color: #444; line-height: 1.4;">Are you sure?</p>
+      <div class="prompt-buttons">
+        <button class="btn-prompt-cancel" id="confirm-btn-no">Cancel</button>
+        <button class="btn-prompt-save" id="confirm-btn-yes" style="background: var(--danger);">Confirm</button>
       </div>
     </div>
-    <div class="consumed-display"><span class="consumed-label">Consumed:</span><span id="consumed-a">0.00</span>L</div>
-    <div class="pour-buttons">
-      <button class="pour-btn" data-keg="a" data-amount="330" aria-label="Pour 330 milliliters">330ml</button>
-      <button class="pour-btn" data-keg="a" data-amount="425" aria-label="Pour 425 milliliters">425ml</button>
-      <button class="pour-btn" data-keg="a" data-amount="500" aria-label="Pour 500 milliliters">500ml</button>
-      <button class="pour-btn" data-keg="a" data-amount="570" aria-label="Pour 570 milliliters">570ml</button>
-      <button class="pour-btn" data-keg="a" data-amount="1000" aria-label="Pour 1 liter">1L</button>
-      <button class="pour-btn" data-keg="a" data-amount="other" aria-label="Pour other amount">Other</button>
+  </div>
+
+  <!-- DATABASE SEARCH MODAL -->
+  <div id="search-modal">
+    <div class="search-modal-content">
+      <div class="job-modal-header">
+        <h2 class="job-modal-title">🔍 Search Part Database</h2>
+      </div>
+      <div class="prompt-group" style="margin-bottom: 10px;">
+        <label for="search-input-box">Search by Part Number or Description (e.g. thermostat)</label>
+        <input type="text" id="search-input-box" placeholder="Type keyword...">
+      </div>
+      <div class="search-results-list" id="search-results-container">
+        <div class="empty-state">Type a keyword above to search your personal database...</div>
+      </div>
+      <button class="btn-close-modal">Close Search</button>
     </div>
-    <button class="btn-reset" data-keg="a" aria-label="Reset Tap A to full">Reset Tap A</button>
-  </section>
-  <section class="keg-section" id="keg-b" aria-label="Tap B">
-    <div class="keg-header">
-      <h2>Tap B</h2>
-      <div class="keg-status Ready" id="status-b">Loading...</div>
-    </div>
-    <div class="keg-display">
-      <div class="remaining-display" aria-live="polite" aria-atomic="true"><span class="remaining-amount" id="remaining-b">0.00</span>L remaining</div>
-      <div class="progress-container">
-        <div class="progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="progress-bar-b" style="--progress:0%;">
-          <span class="progress-text" id="progress-text-b">0%</span>
-        </div>
+  </div>
+
+  <!-- IN-APP JOB CARD PROMPT MODAL -->
+  <div id="job-prompt-modal">
+    <div class="prompt-card">
+      <h3 class="prompt-title" id="prompt-modal-title">Save Job Card</h3>
+      
+      <div class="prompt-group">
+        <label for="modal-job-no">Job / Bus Number *</label>
+        <input type="text" id="modal-job-no" placeholder="e.g. 5013">
+      </div>
+
+      <div class="prompt-group">
+        <label for="modal-job-desc">Job Description (Optional)</label>
+        <input type="text" id="modal-job-desc" placeholder="e.g. COMPRESSOR">
+      </div>
+
+      <div class="prompt-buttons">
+        <button class="btn-prompt-cancel">Cancel</button>
+        <button class="btn-prompt-save">Save</button>
       </div>
     </div>
-    <div class="consumed-display"><span class="consumed-label">Consumed:</span><span id="consumed-b">0.00</span>L</div>
-    <div class="pour-buttons">
-      <button class="pour-btn" data-keg="b" data-amount="330" aria-label="Pour 330 milliliters">330ml</button>
-      <button class="pour-btn" data-keg="b" data-amount="425" aria-label="Pour 425 milliliters">425ml</button>
-      <button class="pour-btn" data-keg="b" data-amount="500" aria-label="Pour 500 milliliters">500ml</button>
-      <button class="pour-btn" data-keg="b" data-amount="570" aria-label="Pour 570 milliliters">570ml</button>
-      <button class="pour-btn" data-keg="b" data-amount="1000" aria-label="Pour 1 liter">1L</button>
-      <button class="pour-btn" data-keg="b" data-amount="other" aria-label="Pour other amount">Other</button>
+  </div>
+
+  <!-- EMBEDDED USER GUIDE MODAL -->
+  <div id="guide-modal">
+    <div class="job-modal-content">
+      <div class="job-modal-header">
+        <h2 class="job-modal-title">📖 Part Picker User Guide</h2>
+      </div>
+
+      <div class="guide-body">
+        <div>Welcome to <strong>Part Picker</strong>, your mobile-first inventory and job card companion. This guide explains how to scan, search, manage job cards, load templates, and zap barcodes at your computer terminal.</div>
+
+        <h3>1. Getting Started &amp; Searching</h3>
+        <ul>
+          <li><strong>Database Search:</strong> Tap <strong>🔍 Search Database</strong> at the top to instantly search your entire history, saved jobs, and templates for terms like "thermostat" or "filter".</li>
+          <li><strong>Camera Scanning:</strong> Tap <strong>📷 Scan</strong>, point your camera at any 1D barcode or orange shelf label.</li>
+        </ul>
+
+        <h3>2. Adding Parts &amp; Templates</h3>
+        <ul>
+          <li><strong>Templates to Job Cards:</strong> Under <strong>My Template Groups</strong>, tap <strong>Load to List</strong> to instantly load a saved template into your active scan list, then tap **Save to Job Card**.</li>
+          <li><strong>Locations:</strong> Each part displays its bin location (e.g. <code>3A2</code>) so you can easily locate it in the store.</li>
+        </ul>
+
+        <h3>3. Active List &amp; Terminal Integration</h3>
+        <ul>
+          <li><strong>Screen Barcodes:</strong> Open any saved Job Card or Template, tap <strong>📱 Screen Barcodes</strong>, and zap each large barcode directly off your phone screen using your wireless Zebra scanner.</li>
+        </ul>
+      </div>
+
+      <button class="btn-close-modal">Close Guide</button>
     </div>
-    <button class="btn-reset" data-keg="b" aria-label="Reset Tap B to full">Reset Tap B</button>
-  </section>
-</div>
-<div class="history-section" aria-live="polite" aria-atomic="true">
-  <h3>Recent Pour History</h3>
-  <div id="pour-history">Loading history...</div>
-  <button onclick="window.dualKegTracker.loadPourHistory()">Refresh History</button>
-</div>
-
-<!-- Reusable Modal for both custom pour and confirmation -->
-<div id="universal-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
-  <h3 id="modal-title">Modal Title</h3>
-  
-  <!-- Content area - will be populated based on modal type -->
-  <div id="modal-content">
-    <!-- For custom pour -->
-    <input id="custom-amount" type="number" min="1" max="5000" placeholder="Enter ml" style="display: none;" />
-    <div id="modal-warning" class="modal-warning" aria-live="polite"></div>
-    
-    <!-- For confirmation -->
-    <div id="modal-message" class="modal-message" style="display: none;"></div>
   </div>
-  
-  <div class="modal-buttons">
-    <button id="modal-cancel">Cancel</button>
-    <button id="modal-confirm">Confirm</button>
-  </div>
-</div>
-<div class="modal-backdrop"></div>
 
-<script>
-  const SUPABASE_URL = "https://damprmcwxluzsscwtkpv.supabase.co";
-  const SUPABASE_KEY = "sb_publishable_7gfnQ_G4FmvWAeLQ4OZM0Q_9lpb71wq";
-  const supabase = supabase.createClient(SUPABASEURL, SUPABASEKEY)
+  <!-- VIEWER MODAL (List OR Swipeable Screen Barcode Carousel) -->
+  <div id="job-modal">
+    <div class="job-modal-content">
+      <div class="job-modal-header">
+        <div>
+          <h2 class="job-modal-title" id="job-modal-title">Reference</h2>
+          <span class="job-modal-date" id="job-modal-date">Date</span>
+        </div>
+      </div>
 
-  
-  class DualKegTracker {
-    constructor() {
-      this.kegCapacity = 19;
-      this.lowWarningThreshold = 6;
-      this.taps = {};
-      this.currentModalTapId = null;
-      this.modalType = null; // 'pour' or 'reset'
-      this.pendingResetTapId = null; // Store tap ID for reset confirmation
-      this.init();
-    }
-    
-    async init() {
-      this.bindEvents();
-      await this.loadTaps();
-      await this.loadPourHistory();
-      this.setupRealtimeSubscription();
-    }
-    
-    bindEvents() {
-      document.querySelectorAll('.pour-btn').forEach(btn =>
-        btn.addEventListener('click', e => this.handlePourClick(e))
-      );
-      document.querySelectorAll('.btn-reset').forEach(btn =>
-        btn.addEventListener('click', e => this.handleResetClick(e))
-      );
-      document.getElementById('modal-cancel').addEventListener('click', () => this.closeModal());
-      document.getElementById('modal-confirm').addEventListener('click', () => this.handleModalConfirm());
-      document.querySelector('.modal-backdrop').addEventListener('click', () => this.closeModal());
-      
-      const input = document.getElementById('custom-amount');
-      input.addEventListener('input', () => this.validateCustomInput());
-      input.addEventListener('keypress', e => {
-        if (e.key === 'Enter' && !document.getElementById('modal-confirm').disabled) {
-          this.handleModalConfirm();
-        }
-      });
-    }
-    
-    async loadTaps() {
-      const { data, error } = await supabase.from('taps').select('*');
-      if (error) {
-        console.error('Error loading taps:', error);
-        return;
-      }
-      data.forEach(tap => this.taps[tap.id] = tap);
-      this.renderAllTaps();
-    }
-    
-    renderAllTaps() {
-      Object.values(this.taps).forEach(tap => this.renderTap(tap));
-      this.updateSummary();
-    }
-    
-    renderTap(tap) {
-      let kegId = null;
-      if (tap.tap_name.toLowerCase() === 'tap a') kegId = 'a';
-      else if (tap.tap_name.toLowerCase() === 'tap b') kegId = 'b';
-      else return;
-      
-      document.getElementById(`remaining-${kegId}`).textContent = tap.remaining.toFixed(2);
-      document.getElementById(`consumed-${kegId}`).textContent = tap.consumed.toFixed(2);
-      
-      const percent = Math.round((tap.remaining / this.kegCapacity) * 100);
-      const progBar = document.getElementById(`progress-bar-${kegId}`);
-      if (progBar) progBar.style.setProperty('--progress', percent + '%');
-      document.getElementById(`progress-text-${kegId}`).textContent = percent + '%';
-      
-      const statusEl = document.getElementById(`status-${kegId}`);
-      statusEl.classList.remove('Ready', 'warning', 'error');
-      if (tap.remaining <= 0) {
-        statusEl.textContent = 'Keg Empty';
-        statusEl.classList.add('error');
-      } else if (tap.remaining < this.lowWarningThreshold) {
-        statusEl.textContent = `Warning: Low (${tap.remaining.toFixed(2)}L left)`;
-        statusEl.classList.add('warning');
-      } else {
-        statusEl.textContent = 'Now Pouring!';
-        statusEl.classList.add('Ready');
-      }
-    }
-    
-    updateSummary() {
-      const totalRemaining = Object.values(this.taps).reduce((sum, t) => sum + t.remaining, 0);
-      const totalConsumed = Object.values(this.taps).reduce((sum, t) => sum + t.consumed, 0);
-      document.getElementById('total-remaining').textContent = totalRemaining.toFixed(2) + 'L';
-      document.getElementById('total-consumed').textContent = totalConsumed.toFixed(2) + 'L';
-    }
-    
-    async handlePourClick(e) {
-      const kegId = e.target.dataset.keg;
-      const amountStr = e.target.dataset.amount;
-      let tapName = kegId === 'a' ? 'tap a' : 'tap b';
-      const tap = Object.values(this.taps).find(t => t.tap_name.toLowerCase() === tapName);
-      if (!tap) return alert(`No data found for ${tapName}`);
-      
-      if (amountStr === 'other') {
-        this.openPourModal(tap.id);
-      } else {
-        const amount = parseInt(amountStr);
-        await this.pourTap(tap.id, amount);
-      }
-    }
-    
-    async handleResetClick(e) {
-      const kegId = e.target.dataset.keg;
-      const tapName = kegId === 'a' ? 'tap a' : 'tap b';
-      const tap = Object.values(this.taps).find(t => t.tap_name.toLowerCase() === tapName);
-      if (!tap) return alert(`No data found for ${tapName}`);
-      
-      // Open confirmation modal instead of directly resetting
-      this.openResetConfirmationModal(tap.id, tapName);
-    }
-    
-    // Open modal for custom pour amount
-    openPourModal(tapId) {
-      this.modalType = 'pour';
-      this.currentModalTapId = tapId;
-      
-      const modal = document.getElementById('universal-modal');
-      const backdrop = document.querySelector('.modal-backdrop');
-      
-      // Set up modal for custom pour
-      document.getElementById('modal-title').textContent = 'Enter Custom Pour (ml)';
-      document.getElementById('custom-amount').style.display = 'block';
-      document.getElementById('modal-message').style.display = 'none';
-      document.getElementById('modal-warning').style.display = 'none';
-      
-      const input = document.getElementById('custom-amount');
-      input.value = '';
-      input.focus();
-      
-      document.getElementById('modal-confirm').textContent = 'Pour';
-      document.getElementById('modal-confirm').disabled = true;
-      
-      modal.classList.add('open');
-      backdrop.classList.add('open');
-    }
-    
-    // Open modal for reset confirmation
-    openResetConfirmationModal(tapId, tapName) {
-      this.modalType = 'reset';
-      this.pendingResetTapId = tapId;
-      
-      const modal = document.getElementById('universal-modal');
-      const backdrop = document.querySelector('.modal-backdrop');
-      
-      // Set up modal for reset confirmation
-      const tapDisplayName = tapName.charAt(0).toUpperCase() + tapName.slice(1);
-      document.getElementById('modal-title').textContent = 'Confirm Reset';
-      document.getElementById('custom-amount').style.display = 'none';
-      document.getElementById('modal-warning').style.display = 'none';
-      
-      const messageEl = document.getElementById('modal-message');
-      messageEl.style.display = 'block';
-      messageEl.innerHTML = `Are you sure you want to reset <strong>${tapDisplayName}</strong> to full?<br><br>This will reset the consumed amount to 0L and mark the keg as full (${this.kegCapacity}L).`;
-      
-      document.getElementById('modal-confirm').textContent = 'Reset Keg';
-      document.getElementById('modal-confirm').disabled = false;
-      
-      modal.classList.add('open');
-      backdrop.classList.add('open');
-    }
-    
-    closeModal() {
-      this.currentModalTapId = null;
-      this.pendingResetTapId = null;
-      this.modalType = null;
-      
-      const modal = document.getElementById('universal-modal');
-      const backdrop = document.querySelector('.modal-backdrop');
-      modal.classList.remove('open');
-      backdrop.classList.remove('open');
-    }
-    
-    async handleModalConfirm() {
-      if (this.modalType === 'pour') {
-        await this.confirmCustomPour();
-      } else if (this.modalType === 'reset') {
-        await this.confirmReset();
-      }
-    }
-    
-    validateCustomInput() {
-      const input = document.getElementById('custom-amount');
-      const val = parseFloat(input.value);
-      const warning = document.getElementById('modal-warning');
-      
-      if (isNaN(val) || val <= 0 || val > 5000) {
-        document.getElementById('modal-confirm').disabled = true;
-        warning.textContent = 'Please enter a number between 1 and 5000 ml';
-        warning.style.display = 'block';
-      } else {
-        document.getElementById('modal-confirm').disabled = false;
-        warning.style.display = 'none';
-      }
-    }
-    
-    async confirmCustomPour() {
-      const input = document.getElementById('custom-amount');
-      const val = parseFloat(input.value);
-      
-      if (isNaN(val) || val <= 0 || val > 5000) {
-        alert('Invalid pour amount');
-        return;
-      }
-      
-      if (this.currentModalTapId) {
-        await this.pourTap(this.currentModalTapId, val);
-      }
-      this.closeModal();
-    }
-    
-    async confirmReset() {
-      if (this.pendingResetTapId) {
-        await this.resetTap(this.pendingResetTapId);
-      }
-      this.closeModal();
-    }
-    
-    async pourTap(tapId, amountMl) {
-      if (typeof amountMl !== 'number' || isNaN(amountMl) || amountMl <= 0) {
-        alert('Invalid pour amount');
-        return;
-      }
-      
-      const tap = this.taps[tapId];
-      const amountL = amountMl / 1000;
-      
-      if (tap.remaining < amountL) {
-        alert(`Not enough beer! Only ${tap.remaining.toFixed(2)}L remaining.`);
-        return;
-      }
-      
-      // Optimistic UI update
-      const newRemaining = +(tap.remaining - amountL).toFixed(2);
-      const newConsumed = +(tap.consumed + amountL).toFixed(2);
-      this.taps[tapId].remaining = newRemaining;
-      this.taps[tapId].consumed = newConsumed;
-      this.renderTap(this.taps[tapId]);
-      this.updateSummary();
+      <div class="job-modal-tabs">
+        <button class="tab-btn active" id="tab-btn-list">📝 Part List</button>
+        <button class="tab-btn" id="tab-btn-barcode">📱 Screen Barcodes</button>
+      </div>
 
-      const { error: tapError } = await supabase.from('taps').update({ remaining: newRemaining, consumed: newConsumed }).eq('id', tapId);
-      if (tapError) {
-        alert('Error updating tap: ' + tapError.message);
-        await this.loadTaps();
-        return;
-      }
+      <!-- Tab 1: Standard Part List View -->
+      <div class="tab-content" id="tab-content-list">
+        <div id="job-modal-list"></div>
+      </div>
 
-      const { error: historyError } = await supabase.from('pour_history').insert([{
-        tap_id: tapId,
-        tap_name: tap.tap_name,
-        amount_ml: amountMl
-      }]);
-      if (historyError) {
-        console.error('Error logging pour history:', historyError);
-      }
-
-      // Cleanup old entries to keep max 50
-      const { data: allEntries, error: countError } = await supabase
-        .from('pour_history')
-        .select('id')
-        .order('poured_at', { ascending: false });
-      if (countError) {
-        console.error('Error fetching pour history count:', countError);
-      } else if (allEntries.length > 50) {
-        const idsToDelete = allEntries.slice(50).map(entry => entry.id);
-        if (idsToDelete.length > 0) {
-          const { error: deleteError } = await supabase
-            .from('pour_history')
-            .delete()
-            .in('id', idsToDelete);
-          if (deleteError) {
-            console.error('Error deleting old pour history:', deleteError);
-          }
-        }
-      }
-
-      await this.loadPourHistory(); // Refresh history display
-    }
-    
-    async resetTap(tapId) {
-      this.taps[tapId].remaining = this.kegCapacity;
-      this.taps[tapId].consumed = 0;
-      this.renderTap(this.taps[tapId]);
-      this.updateSummary();
-
-      const { error: resetError } = await supabase.from('taps').update({ remaining: this.kegCapacity, consumed: 0 }).eq('id', tapId);
-      if (resetError) {
-        alert('Error resetting tap: ' + resetError.message);
-        await this.loadTaps();
-        return;
-      }
-
-      const { error: resetHistoryError } = await supabase.from('pour_history').insert([{
-        tap_id: tapId,
-        tap_name: this.taps[tapId].tap_name,
-        amount_ml: 0,
-        note: 'Tap Reset'
-      }]);
-      if (resetHistoryError) console.error('Error logging tap reset:', resetHistoryError);
-
-      await this.loadPourHistory();
-    }
-    
-    async loadPourHistory() {
-      const { data, error } = await supabase.from('pour_history')
-        .select('*')
-        .order('poured_at', { ascending: false })
-        .limit(10);
-      if (error) {
-        console.error('Error loading pour history:', error);
-        document.getElementById('pour-history').textContent = 'Error loading history.';
-        return;
-      }
-      this.displayPourHistory(data);
-    }
-    
-    displayPourHistory(history) {
-      const container = document.getElementById('pour-history');
-      if (!container) return;
-      if (history.length === 0) {
-        container.textContent = 'No pour history yet.';
-        return;
-      }
-      
-      function formatDateTimeWithMonthWord(dateStr) {
-        const date = new Date(dateStr);
-        const day = String(date.getDate()).padStart(2, '0');
-        const monthNames = [
-          "January", "February", "March", "April", "May", "June",
-          "July", "August", "September", "October", "November", "December"
-        ];
-        const month = monthNames[date.getMonth()];
-        const year = date.getFullYear();
-        const hours = String(date.getHours()).padStart(2, '0');
-        const mins = String(date.getMinutes()).padStart(2, '0');
-        const secs = String(date.getSeconds()).padStart(2, '0');
-        return `${day} ${month} ${year} ${hours}:${mins}:${secs}`;
-      }
-      
-      container.innerHTML = history.map(pour => {
-        // Get the beer name for this tap (if set)
-        const beerName = this.taps[pour.tap_id]?.beer_name || '';
-        return `
-          <div>
-            <strong>${pour.tap_name}${beerName ? ' - ' + beerName : ''}</strong>: 
-            ${pour.amount_ml > 0 ? pour.amount_ml + 'ml' : ''}
-            ${pour.note ? `<span class="history-note">- ${pour.note}</span>` : ''}
-            <small>${formatDateTimeWithMonthWord(pour.poured_at)}</small>
+      <!-- Tab 2: Screen Swipeable 1D Barcode Carousel -->
+      <div class="tab-content" id="tab-content-barcode">
+        <div class="carousel-container">
+          <div class="carousel-card">
+            <div class="carousel-part" id="carousel-part-no">PART-001</div>
+            <div id="carousel-loc-container"><span class="carousel-loc" id="carousel-loc">3A2</span></div>
+            <div class="carousel-desc" id="carousel-part-desc">DESCRIPTION HERE</div>
+            <div class="carousel-barcode-box">
+              <svg id="carousel-barcode-svg"></svg>
+            </div>
           </div>
-        `;
-      }).join('');
-    }
+          
+          <div class="carousel-nav">
+            <button class="btn-carousel" id="carousel-prev">◀ Prev</button>
+            <span class="carousel-counter" id="carousel-counter">1 of 5</span>
+            <button class="btn-carousel" id="carousel-next">Next ▶</button>
+          </div>
+          
+          <div style="font-size: 12px; color: #666; margin-top: 5px; text-align: center;">
+            Zap each barcode with your Zebra scanner at the computer terminal.
+          </div>
+        </div>
+      </div>
+
+      <button class="btn-close-modal">Close Viewer</button>
+    </div>
+  </div>
+
+  <!-- MOBILE UI -->
+  <div class="app-container">
+    <h1>Part Picker</h1>
     
-    setupRealtimeSubscription() {
-      supabase
-        .from('taps')
-        .on('UPDATE', payload => {
-          const updated = payload.new;
-          this.taps[updated.id] = updated;
-          this.renderTap(updated);
-          this.updateSummary();
-        })
-        .subscribe();
-    }
-  }
+    <!-- EMBEDDED USER GUIDE & SEARCH BUTTONS -->
+    <button class="btn-search-top">🔍 Search Database</button>
+    <button class="btn-guide-top">📖 User Guide &amp; Instructions</button>
+
+      <button class="btn-backup-top">💾 Download Full Backup</button>
+      <button class="btn-import-top">📥 Import JSON Backup</button>
+      <input id="backup-file-input" type="file" accept="application/json,.json" style="display:none">
+    
+    <div class="input-card" id="input-card">
+      <!-- Top Row: Part Number, Location, Scan Button -->
+      <div class="input-row-top">
+        <div class="part-col">
+          <label for="partNo">Part Number</label>
+          <input type="text" id="partNo" placeholder="">
+        </div>
+        <div class="loc-col">
+          <label for="loc">Location</label>
+          <input type="text" id="loc" placeholder="" maxlength="10">
+        </div>
+        <div class="scan-col">
+          <label>&nbsp;</label>
+          <button class="btn-scan-trigger" type="button">📷 Scan</button>
+        </div>
+      </div>
+      
+      <!-- Second Row: Item Description (Large Box) -->
+      <div class="input-row">
+        <label for="desc">Item Description</label>
+        <input type="text" id="desc" placeholder="">
+      </div>
+
+      <!-- Third Row: Qty & Add Button -->
+      <div class="input-row-split">
+        <div class="qty-container">
+          <label for="itemQty">Qty</label>
+          <input type="number" id="itemQty" value="1" min="1" max="999">
+        </div>
+        <div style="flex-grow: 1;">
+          <button class="btn" id="add-btn">Add to List</button>
+        </div>
+      </div>
+
+      <div class="button-group" style="margin-top: 10px;">
+        <button class="btn btn-cancel" id="cancel-btn">Cancel Edit</button>
+      </div>
+    </div>
+
+    <!-- Active List Section -->
+    <div class="list-header">
+      <span>Active Scan List</span>
+      <span style="background: var(--primary); color: white; padding: 2px 8px; border-radius: 12px; font-size: 14px;" id="count-badge">0</span>
+    </div>
+    
+    <!-- Workbench Editing Banner -->
+    <div id="editing-banner" class="editing-banner" style="display: none;">
+      <div class="editing-banner-header">
+        <span class="editing-banner-title" id="editing-banner-text">Editing Job/Template...</span>
+        <button class="btn-banner-rename">Rename</button>
+      </div>
+      <div style="display:flex; gap: 8px;">
+        <button class="btn-banner-cancel">Cancel Edits</button>
+        <button class="btn-banner-save">Save Changes</button>
+      </div>
+    </div>
+
+    <div class="scanned-list">
+      <div id="list"><div class="empty-state" id="empty-state">No parts scanned yet.</div></div>
+    </div>
+
+    <!-- Main Actions -->
+    <div id="action-buttons" style="display: none;">
+      <button class="btn btn-job-save">Save to Job Card</button>
+      <button class="btn btn-group-init">📱 Screen Barcodes</button>
+      <button class="btn btn-clear">Clear Active List</button>
+    </div>
+
+    <!-- Job Cards Section (Collapsible) -->
+    <div class="groups-section job-section" id="jobs-section" style="display: none;">
+      <div class="list-header" style="margin-top:0; display:flex; justify-content:space-between; align-items:center; cursor: pointer;">
+        <span id="jobs-title-text">My Saved Job Cards ▾</span>
+        <span style="background: var(--info); color: white; padding: 2px 8px; border-radius: 12px; font-size: 14px;" id="jobs-count-badge">0</span>
+      </div>
+      <div class="scanned-list" id="jobs-list-container" style="display: none; background: transparent; box-shadow: none; margin-bottom: 0;">
+        <div id="jobs-list">
+          <!-- Job Cards render here -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Saved Template Groups Section (Collapsible) -->
+    <div class="groups-section" id="groups-section" style="display: block;">
+      <div class="list-header" style="margin-top:0; display:flex; justify-content:space-between; align-items:center;">
+        <span id="groups-title-text" style="cursor: pointer; flex-grow: 1;">My Template Groups ▾</span>
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span style="background: var(--primary); color: white; padding: 2px 8px; border-radius: 12px; font-size: 14px;" id="groups-count-badge">0</span>
+          <button class="btn-action edit" style="font-weight:bold; border-color:var(--primary); color:var(--primary); padding: 4px 10px;">+ Save Current List</button>
+        </div>
+      </div>
+      <div class="scanned-list" id="groups-list-container" style="display: none; background: transparent; box-shadow: none; margin-bottom: 0;">
+        <div id="groups-list"><div class="empty-state">No template groups saved yet. Click "+ Save Current List" above to create one.</div></div>
+      </div>
+    </div>
+
+    <!-- Scan History Section -->
+    <div class="groups-section" id="history-section" style="display: none;">
+      <div class="list-header" style="margin-top:0; display:flex; justify-content:space-between; align-items:center; cursor: pointer;">
+        <span id="history-title-text">Scan History (Last 25) ▾</span>
+        <button class="btn-action remove" style="font-weight:normal; border-color:transparent;">Clear All</button>
+      </div>
+      <div class="scanned-list" id="history-list" style="display: none;">
+        <!-- History renders here -->
+      </div>
+    </div>
+  </div>
+
+  <!-- PRINT UI -->
+  <div id="print-layout"></div>
+
   
-  document.addEventListener('DOMContentLoaded', () => {
-    window.dualKegTracker = new DualKegTracker();
-  });
-</script>
-</body>
-</html>
+
+
+
+</body></html>
+------MultipartBoundary--yiKahtgz02vEcBUc2XVlkK30HGJMsYO0N7UVWJwUCH----
+Content-Type: text/css
+Content-Transfer-Encoding: binary
+Content-Location: cid:css-5969cb9a-42e7-4c91-a38f-0a17d50d85da@mhtml.blink
+
+@charset "utf-8";
+
+:root { --primary: #0056b3; --primary-dark: #004494; --secondary: #6c757d; --danger: #dc3545; --success: #28a745; --warning: #ffc107; --info: #17a2b8; --bg: #f4f7f6; --card-bg: #ffffff; --text: #333333; }
+
+body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; margin: 0px; padding: 0px; background-color: var(--bg); color: var(--text); }
+
+@media screen {
+  .app-container { max-width: 600px; margin: 0px auto; padding: 20px; }
+  h1 { font-size: 24px; text-align: center; margin-bottom: 20px; color: var(--primary); }
+  .btn-guide-top { background-color: var(--secondary); color: white; border-width: medium; border-style: none; border-color: currentcolor; border-image: none; border-radius: 8px; padding: 10px 16px; font-size: 14px; font-weight: bold; cursor: pointer; width: 100%; margin-bottom: 15px; display: flex; align-items: center; justify-content: center; gap: 8px; transition: opacity 0.2s; }
+  .btn-guide-top:active { opacity: 0.8; }
+  .btn-backup-top, .btn-import-top { color: white; border-width: medium; border-style: none; border-color: currentcolor; border-image: none; border-radius: 8px; padding: 10px 16px; font-size: 14px; font-weight: bold; cursor: pointer; width: 100%; margin-bottom: 12px; display: flex; align-items: center; justify-content: center; gap: 8px; transition: opacity 0.2s; }
+  .btn-backup-top { background-color: var(--success); }
+  .btn-import-top { background-color: var(--warning); color: rgb(17, 17, 17); }
+  .btn-backup-top:active, .btn-import-top:active { opacity: 0.8; }
+  .btn-search-top { background-color: var(--info); color: white; border-width: medium; border-style: none; border-color: currentcolor; border-image: none; border-radius: 8px; padding: 10px 16px; font-size: 14px; font-weight: bold; cursor: pointer; width: 100%; margin-bottom: 24px; display: flex; align-items: center; justify-content: center; gap: 8px; transition: opacity 0.2s; }
+  .btn-search-top:active { opacity: 0.8; }
+  .input-card { background: var(--card-bg); padding: 20px; border-radius: 12px; box-shadow: rgba(0, 0, 0, 0.08) 0px 4px 12px; margin-bottom: 24px; transition: 0.3s; }
+  .input-card.editing { border: 2px solid var(--warning); box-shadow: rgba(255, 193, 7, 0.3) 0px 4px 15px; }
+  label { font-weight: 600; display: block; margin-bottom: 6px; font-size: 13px; color: rgb(85, 85, 85); }
+  .input-row-top { display: flex; gap: 8px; margin-bottom: 16px; align-items: flex-end; }
+  .part-col { flex-grow: 1; }
+  .loc-col { width: 85px; flex-shrink: 0; }
+  .scan-col { width: 85px; flex-shrink: 0; }
+  .input-row { margin-bottom: 16px; }
+  .input-row-split { display: flex; gap: 10px; margin-bottom: 16px; align-items: flex-end; }
+  .qty-container { width: 90px; flex-shrink: 0; }
+  input[type="text"], input[type="number"] { width: 100%; padding: 12px; border: 1px solid rgb(204, 204, 204); border-radius: 6px; box-sizing: border-box; font-size: 16px; transition: border-color 0.2s; background: rgb(255, 255, 255); }
+  input[type="text"] { text-transform: uppercase; }
+  input[type="text"]:focus, input[type="number"]:focus { outline: none; border-color: var(--primary); }
+  .btn-scan-trigger { background-color: var(--text); color: white; border-width: medium; border-style: none; border-color: currentcolor; border-image: none; border-radius: 6px; padding: 12px 0px; font-weight: bold; cursor: pointer; width: 100%; display: flex; align-items: center; justify-content: center; font-size: 14px; white-space: nowrap; height: 48px; box-sizing: border-box; }
+  .btn { display: block; width: 100%; padding: 14px; background-color: var(--primary); color: white; border-width: medium; border-style: none; border-color: currentcolor; border-image: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.2s; }
+  .btn:active { opacity: 0.8; }
+  .button-group { display: flex; gap: 10px; }
+  .btn-cancel { background-color: var(--secondary); display: none; }
+  .btn-update { background-color: var(--warning); color: rgb(0, 0, 0); }
+  .btn-group-init { background-color: var(--success); margin-top: 12px; }
+  .btn-job-save { background-color: var(--info); margin-top: 12px; }
+  .btn-clear { background-color: transparent; color: var(--danger); border: 2px solid var(--danger); margin-top: 12px; margin-bottom: 40px; }
+  .list-header { font-weight: bold; margin-top: 30px; margin-bottom: 12px; font-size: 18px; display: flex; justify-content: space-between; align-items: center; }
+  .editing-banner { background: var(--warning); color: rgb(0, 0, 0); padding: 12px 15px; border-radius: 8px; margin-bottom: 15px; font-weight: bold; display: flex; flex-direction: column; gap: 10px; }
+  .editing-banner-header { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+  .editing-banner-title { flex-grow: 1; }
+  .btn-banner-rename { background: transparent; border: 1px solid rgb(0, 0, 0); padding: 4px 10px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 12px; }
+  .btn-banner-rename:active { background: rgba(0, 0, 0, 0.1); }
+  .btn-banner-save { background: var(--success); color: white; border-width: medium; border-style: none; border-color: currentcolor; border-image: none; padding: 8px 16px; border-radius: 6px; font-weight: bold; cursor: pointer; }
+  .btn-banner-cancel { background: transparent; color: rgb(0, 0, 0); border: 1px solid rgb(0, 0, 0); padding: 8px 16px; border-radius: 6px; font-weight: bold; cursor: pointer; }
+  .scanned-list { background: var(--card-bg); border-radius: 12px; box-shadow: rgba(0, 0, 0, 0.05) 0px 2px 8px; overflow: hidden; margin-bottom: 10px; }
+  .scanned-item { padding: 12px 16px; border-bottom: 1px solid rgb(238, 238, 238); display: flex; flex-direction: column; gap: 6px; }
+  .scanned-item:last-child { border-bottom-width: medium; border-bottom-style: none; border-bottom-color: currentcolor; }
+  .item-part-line { font-weight: bold; font-size: 18px; font-family: monospace; color: var(--primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .item-desc-line { font-size: 13px; color: rgb(85, 85, 85); font-weight: 500; word-break: break-word; display: flex; align-items: center; flex-wrap: wrap; gap: 6px; }
+  .item-footer-row { display: flex; justify-content: space-between; align-items: center; gap: 10px; border-top: 1px solid rgb(242, 242, 242); padding-top: 8px; margin-top: 2px; }
+  .qty-badge { background: rgb(226, 232, 240); color: rgb(30, 41, 59); padding: 2px 8px; border-radius: 10px; font-size: 12px; font-weight: bold; display: inline-flex; align-items: center; gap: 4px; }
+  .qty-btn { background: none; border-width: medium; border-style: none; border-color: currentcolor; border-image: none; font-weight: bold; cursor: pointer; padding: 0px 4px; font-size: 14px; color: rgb(85, 85, 85); }
+  .qty-btn:hover { color: var(--primary); }
+  .loc-badge { background: rgb(226, 232, 240); color: rgb(30, 41, 59); padding: 2px 6px; border-radius: 6px; font-size: 11px; font-weight: bold; display: inline-flex; align-items: center; gap: 3px; letter-spacing: 0.5px; }
+  .oos-badge { color: var(--danger); border: 1px solid var(--danger); padding: 1px 4px; border-radius: 4px; font-size: 11px; font-weight: bold; display: inline-block; white-space: nowrap; line-height: 1.2; }
+  .item-actions { display: flex; gap: 6px; }
+  .btn-action { background: transparent; border: 1px solid rgb(204, 204, 204); padding: 6px 10px; border-radius: 4px; font-size: 12px; cursor: pointer; font-weight: 600; }
+  .btn-action.oos { color: rgb(102, 102, 102); border-color: rgb(204, 204, 204); }
+  .btn-action.oos.active { background-color: var(--danger); color: white; border-color: var(--danger); }
+  .btn-action.edit { color: var(--primary); border-color: var(--primary); }
+  .btn-action.remove { color: var(--danger); border-color: var(--danger); }
+  .empty-state { padding: 20px; text-align: center; color: rgb(136, 136, 136); font-style: italic; }
+  .groups-section { margin-top: 30px; border-top: 2px dashed rgb(204, 204, 204); padding-top: 15px; }
+  .job-section { border-top: 2px dashed var(--info); }
+  .group-card { background: rgb(255, 255, 255); border: 1px solid rgb(221, 221, 221); border-radius: 8px; padding: 12px; margin-bottom: 12px; display: flex; flex-direction: column; gap: 10px; }
+  .job-card { border-left: 4px solid var(--info); }
+  .group-header { display: flex; justify-content: space-between; align-items: center; }
+  .group-title { font-weight: bold; font-size: 16px; color: var(--text); }
+  .group-count { font-size: 12px; color: rgb(102, 102, 102); background: rgb(238, 238, 238); padding: 2px 6px; border-radius: 10px; }
+  .group-actions { display: flex; gap: 6px; }
+  .btn-load { background: var(--primary); color: white; border-width: medium; border-style: none; border-color: currentcolor; border-image: none; padding: 8px 0px; border-radius: 4px; font-weight: bold; cursor: pointer; flex-grow: 1; font-size: 12px; }
+  .btn-barcode-group { background: var(--info); color: white; border-width: medium; border-style: none; border-color: currentcolor; border-image: none; padding: 8px 0px; border-radius: 4px; font-weight: bold; cursor: pointer; flex-grow: 1; font-size: 12px; }
+  .btn-view { background: var(--info); color: white; border-width: medium; border-style: none; border-color: currentcolor; border-image: none; padding: 8px 0px; border-radius: 4px; font-weight: bold; cursor: pointer; flex-grow: 1; font-size: 12px; }
+  .btn-print-group { background: var(--success); color: white; border-width: medium; border-style: none; border-color: currentcolor; border-image: none; padding: 8px 0px; border-radius: 4px; font-weight: bold; cursor: pointer; flex-grow: 1; font-size: 12px; }
+  .btn-edit-group { background: var(--secondary); color: white; border-width: medium; border-style: none; border-color: currentcolor; border-image: none; padding: 8px 0px; border-radius: 4px; font-weight: bold; cursor: pointer; flex-grow: 1; font-size: 12px; }
+  .btn-delete-group { background: transparent; color: var(--danger); border: 1px solid var(--danger); padding: 8px 10px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 12px; }
+  #scanner-modal { display: none; position: fixed; top: 0px; left: 0px; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.95); z-index: 9999; flex-direction: column; justify-content: center; align-items: center; padding: 15px; box-sizing: border-box; }
+  #reader { width: 100%; max-width: 500px; background: black; }
+  .btn-close-scanner { margin-top: 20px; background: var(--danger); color: white; padding: 12px 24px; border-width: medium; border-style: none; border-color: currentcolor; border-image: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 16px; width: 100%; max-width: 500px; }
+  #job-prompt-modal, #custom-confirm-modal { display: none; position: fixed; top: 0px; left: 0px; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85); z-index: 10001; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box; }
+  .prompt-card { background: white; width: 100%; max-width: 400px; border-radius: 12px; padding: 20px; display: flex; flex-direction: column; gap: 15px; box-shadow: rgba(0, 0, 0, 0.2) 0px 4px 20px; }
+  .prompt-title { font-size: 18px; font-weight: bold; color: var(--primary); margin: 0px; }
+  .prompt-group { display: flex; flex-direction: column; gap: 6px; }
+  .prompt-buttons { display: flex; gap: 10px; margin-top: 5px; }
+  .btn-prompt-save { flex: 1 1 0%; background: var(--success); color: white; border-width: medium; border-style: none; border-color: currentcolor; border-image: none; padding: 12px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 15px; }
+  .btn-prompt-cancel { flex: 1 1 0%; background: var(--secondary); color: white; border-width: medium; border-style: none; border-color: currentcolor; border-image: none; padding: 12px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 15px; }
+  #search-modal { display: none; position: fixed; top: 0px; left: 0px; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85); z-index: 10002; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box; }
+  .search-modal-content { background: rgb(255, 255, 255); width: 100%; max-width: 500px; border-radius: 12px; padding: 20px; max-height: 85vh; overflow-y: auto; display: flex; flex-direction: column; }
+  .search-results-list { margin-top: 15px; display: flex; flex-direction: column; gap: 8px; max-height: 50vh; overflow-y: auto; }
+  #job-modal, #guide-modal { display: none; position: fixed; top: 0px; left: 0px; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85); z-index: 10000; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box; }
+  .job-modal-content { background: rgb(255, 255, 255); width: 100%; max-width: 500px; border-radius: 12px; padding: 20px; max-height: 85vh; overflow-y: auto; display: flex; flex-direction: column; }
+  .job-modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid rgb(238, 238, 238); padding-bottom: 15px; margin-bottom: 15px; }
+  .job-modal-title { font-size: 20px; font-weight: bold; color: var(--info); margin: 0px; word-break: break-word; }
+  .job-modal-date { font-size: 13px; color: rgb(136, 136, 136); white-space: nowrap; }
+  .job-modal-tabs { display: flex; gap: 10px; margin-bottom: 15px; }
+  .tab-btn { flex: 1 1 0%; padding: 10px; background: rgb(238, 238, 238); border-width: medium; border-style: none; border-color: currentcolor; border-image: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 14px; }
+  .tab-btn.active { background: var(--info); color: white; }
+  .tab-content { display: none; flex-direction: column; gap: 10px; }
+  .tab-content.active { display: flex; }
+  .guide-body { font-size: 14px; line-height: 1.5; color: rgb(51, 51, 51); display: flex; flex-direction: column; gap: 14px; }
+  .guide-body h3 { color: var(--primary); margin: 10px 0px 4px; font-size: 16px; border-bottom: 1px solid rgb(238, 238, 238); padding-bottom: 4px; }
+  .guide-body ul { margin: 0px; padding-left: 20px; }
+  .guide-body li { margin-bottom: 6px; }
+  .carousel-container { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; background: rgb(249, 249, 249); border: 2px dashed rgb(204, 204, 204); border-radius: 8px; text-align: center; }
+  .carousel-card { background: white; padding: 20px; border-radius: 8px; box-shadow: rgba(0, 0, 0, 0.1) 0px 2px 8px; width: 100%; box-sizing: border-box; margin-bottom: 15px; display: flex; flex-direction: column; align-items: center; }
+  .carousel-part { font-size: 22px; font-weight: bold; font-family: monospace; margin-bottom: 4px; color: var(--primary); }
+  .carousel-loc { font-size: 14px; font-weight: bold; background: rgb(226, 232, 240); color: rgb(30, 41, 59); padding: 2px 8px; border-radius: 6px; margin-bottom: 8px; display: inline-block; }
+  .carousel-desc { font-size: 14px; color: rgb(85, 85, 85); margin-bottom: 15px; font-weight: 500; }
+  .carousel-barcode-box { width: 100%; display: flex; justify-content: center; background: rgb(255, 255, 255); padding: 10px; }
+  .carousel-barcode-box svg { max-width: 100%; height: 90px; }
+  .carousel-nav { display: flex; width: 100%; gap: 10px; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+  .btn-carousel { flex: 1 1 0%; background: var(--text); color: white; border-width: medium; border-style: none; border-color: currentcolor; border-image: none; padding: 12px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 14px; }
+  .btn-carousel:disabled { background: rgb(204, 204, 204); cursor: not-allowed; }
+  .carousel-counter { font-weight: bold; font-size: 14px; color: rgb(102, 102, 102); white-space: nowrap; }
+  .job-modal-item { padding: 10px 0px; border-bottom: 1px solid rgb(238, 238, 238); display: flex; flex-direction: column; gap: 4px; }
+  .job-modal-item:last-child { border-bottom-width: medium; border-bottom-style: none; border-bottom-color: currentcolor; }
+  .job-modal-part { font-size: 18px; font-weight: bold; font-family: monospace; display: flex; align-items: center; gap: 8px; }
+  .job-modal-desc { font-size: 13px; color: rgb(85, 85, 85); display: flex; align-items: center; gap: 8px; }
+  .btn-close-modal { background: var(--text); color: white; padding: 14px; border-width: medium; border-style: none; border-color: currentcolor; border-image: none; border-radius: 8px; width: 100%; margin-top: 20px; font-weight: bold; cursor: pointer; font-size: 16px; }
+  #toast-notification { display: none; position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: rgb(30, 41, 59); color: rgb(255, 255, 255); padding: 12px 24px; border-radius: 8px; z-index: 20000; font-weight: bold; box-shadow: rgba(0, 0, 0, 0.3) 0px 4px 15px; text-align: center; max-width: 90%; font-size: 15px; }
+  #print-layout { display: none; }
+}
+
+@media print {
+  @page { size: a4 landscape; margin: 10mm; }
+  .app-container, #scanner-modal, #job-modal, #guide-modal, #search-modal, #custom-confirm-modal, #toast-notification { display: none !important; }
+  #print-layout { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10mm; width: 100%; }
+  body { background: white; color: black; }
+  .print-card { border: 1px solid rgb(0, 0, 0); border-radius: 4px; padding: 15px; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; height: 160px; box-sizing: border-box; break-inside: avoid; }
+  .print-part { font-size: 20px; font-weight: bold; margin-bottom: 4px; font-family: monospace; }
+  .print-loc { font-size: 13px; font-weight: bold; margin-bottom: 4px; border: 1px solid rgb(0, 0, 0); padding: 1px 6px; border-radius: 3px; display: inline-block; }
+  .print-desc { font-size: 12px; font-weight: bold; text-transform: uppercase; margin-bottom: auto; max-width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .barcode-wrapper { margin-top: 6px; width: 100%; display: flex; justify-content: center; }
+  .barcode-wrapper svg { max-height: 60px; max-width: 100%; }
+}
+------MultipartBoundary--yiKahtgz02vEcBUc2XVlkK30HGJMsYO0N7UVWJwUCH------
