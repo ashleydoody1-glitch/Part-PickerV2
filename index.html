@@ -226,16 +226,23 @@
 
     /* --- PRINT STYLES (A4 Landscape) --- */
     @media print {
-      @page { size: A4 landscape; margin: 10mm; }
-      .app-container, #scanner-modal, #job-modal, #guide-modal, #search-modal, #custom-confirm-modal, #toast-notification { display: none !important; }
-      #print-layout { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10mm; width: 100%; }
-      body { background: white; color: black; }
-      .print-card { border: 1px solid #000; border-radius: 4px; padding: 15px; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; height: 160px; box-sizing: border-box; page-break-inside: avoid; }
-      .print-part { font-size: 20px; font-weight: bold; margin-bottom: 4px; font-family: monospace; }
-      .print-loc { font-size: 13px; font-weight: bold; margin-bottom: 4px; border: 1px solid #000; padding: 1px 6px; border-radius: 3px; display: inline-block; }
-      .print-desc { font-size: 12px; font-weight: bold; text-transform: uppercase; margin-bottom: auto; max-width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-      .barcode-wrapper { margin-top: 6px; width: 100%; display: flex; justify-content: center; }
-      .barcode-wrapper svg { max-height: 60px; max-width: 100%; }
+      @page { size: A4 landscape; margin: 8mm; }
+      /* Only the purpose-built print container should appear. This also hides
+         prompt modals (such as “Save Job Card”) that otherwise bleed onto page 1. */
+      body > *:not(#print-layout) { display: none !important; }
+      html, body { margin: 0 !important; padding: 0 !important; width: 100%; background: #fff !important; color: #000 !important; }
+      #print-layout { display: grid !important; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 5mm; width: 100%; margin: 0; padding: 0; }
+      .print-card { border: 1px solid #000; border-radius: 3px; padding: 5mm 3mm; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; height: 45mm; min-width: 0; box-sizing: border-box; page-break-inside: avoid; break-inside: avoid; overflow: hidden; background: #fff !important; }
+      .print-part { font-size: 16pt; font-weight: bold; margin-bottom: 2mm; font-family: monospace; line-height: 1.1; }
+      .print-loc { font-size: 9pt; font-weight: bold; margin-bottom: 1.5mm; border: 1px solid #000; padding: 1px 4px; border-radius: 2px; display: inline-block; }
+      .print-desc { font-size: 8pt; font-weight: bold; text-transform: uppercase; margin-bottom: auto; max-width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+      .barcode-wrapper { margin-top: 2mm; width: 100%; min-width: 0; display: flex; justify-content: center; align-items: center; overflow: hidden; }
+      .barcode-wrapper svg { display: block; height: auto; max-height: 16mm; max-width: 100%; background: #fff; overflow: hidden; }
+      #print-layout.print-picking-sheet { display: block !important; }
+      #print-layout.print-picking-sheet .print-card { display: none !important; }
+      #print-layout.print-picking-sheet .picking-print-table { display: table; }
+      #print-layout.print-picking-sheet .picking-print-title,
+      #print-layout.print-picking-sheet .picking-print-meta { display: block; }
     }
 
 /* Renovated visual system: original structure and functionality preserved. */
@@ -257,9 +264,28 @@
       #print-layout.print-picking-sheet .picking-print-meta{display:block}
       body:has(#print-layout.print-picking-sheet) #print-layout{display:block;}
       body:has(#print-layout.print-picking-sheet) #print-layout .print-card{display:none}
-      body:has(#print-layout.print-picking-sheet) @page{size:A4 portrait}
     }
     @media print{#print-layout.print-picking-sheet{break-inside:auto}.picking-print-table tr{break-inside:avoid}}
+
+    /* Mobile-first workflow: large touch targets and minimal secondary controls */
+    .mobile-workflow-hint{background:#eaf3ff;border:1px solid #bfd8f7;border-radius:14px;padding:13px 14px;margin:12px 0 14px;display:flex;flex-direction:column;gap:5px;color:#163a63;font-size:14px;line-height:1.4}
+    .mobile-workflow-hint strong{font-size:15px}
+    .mobile-core-actions{grid-template-columns:1fr 1fr;margin-bottom:14px}
+    .mobile-core-actions .quick-action{min-height:58px;font-size:15px}
+    .mobile-tools{margin:0 0 16px;border:1px solid var(--border, #d8e0e8);border-radius:12px;background:#fff}
+    .mobile-tools summary{padding:12px 14px;font-weight:700;cursor:pointer;min-height:24px}
+    .mobile-tools .quick-grid{padding:0 10px 10px;grid-template-columns:1fr 1fr}
+    .mobile-show-barcode{font-size:18px!important;min-height:58px;width:100%;box-shadow:0 3px 0 rgba(0,0,0,.08)}
+    #partNo{font-size:18px!important;font-weight:700;letter-spacing:.3px}
+    #itemQty{font-size:18px!important;min-height:48px}
+    #add-btn,.btn-scan-trigger{min-height:52px;font-size:17px}
+    .list-header{margin-top:22px}
+    #job-modal{padding:10px!important}
+    #job-modal .job-modal-content{width:100%;max-width:100%;border-radius:16px}
+    #tab-content-barcode{padding:12px 6px!important}
+    #carousel-barcode-svg{max-width:100%;height:auto}
+    @media(max-width:480px){.app-container{padding:12px!important}.brand h1{font-size:23px}.input-row-top{gap:8px}.mobile-core-actions{gap:8px}.mobile-core-actions .quick-action{padding:10px 7px}.mobile-workflow-hint{font-size:13px}.mobile-show-barcode{position:sticky;bottom:8px;z-index:3}}
+
   </style>
 </head>
 <body>
@@ -332,23 +358,38 @@
       </div>
 
       <div class="guide-body">
-        <div>Welcome to <strong>Part Picker</strong>, your mobile-first inventory and job card companion. This guide explains how to scan, search, manage job cards, load templates, and zap barcodes at your computer terminal.</div>
+        <div><strong>Part Picker is designed for your phone at the shelves.</strong> It turns the part number from a shelf barcode into a fresh, easy-to-scan barcode on your phone. You then scan that phone screen at the booking-out computer. It does not change stock levels or automatically send anything to the booking-out system.</div>
 
-        <h3>1. Getting Started & Searching</h3>
+        <h3>1. At the shelf: capture the part number</h3>
+        <ol>
+          <li>Tap <strong>Scan shelf barcode</strong> (or the smaller <strong>Scan</strong> button beside the Part Number field).</li>
+          <li>Allow camera access if prompted, then point the phone camera at the barcode on the shelf/part.</li>
+          <li>Check the Part Number field. If the shelf barcode cannot be read, type the part number manually instead.</li>
+          <li>Optionally add a shelf location or description, and set <strong>Qty</strong> to the number of times that part needs to be booked out.</li>
+          <li>Tap <strong>Add to List</strong>. Repeat for each part you need to collate.</li>
+        </ol>
+
+        <h3>2. Check and save your part set</h3>
         <ul>
-          <li><strong>Database Search:</strong> Tap <strong> Search Database</strong> at the top to instantly search your entire history, saved jobs, and templates for terms like "thermostat" or "filter".</li>
-          <li><strong>Camera Scanning:</strong> Tap <strong> Scan</strong>, point your camera at any 1D barcode or orange shelf label.</li>
+          <li>Review the <strong>Active Scan List</strong> and correct any part number, quantity or description before using the barcodes.</li>
+          <li>Tap <strong>Show generated barcodes</strong> to display the active list as barcodes on your phone.</li>
+          <li>Tap <strong>Save this part set</strong> for a reusable template, or <strong>Save as job card</strong> to save it under a job/bus number. Saved sets can be loaded again later.</li>
+          <li>Use <strong>Find a part</strong> or the saved-set filter to find previously used parts and templates.</li>
         </ul>
 
-        <h3>2. Adding Parts & Templates</h3>
-        <ul>
-          <li><strong>Templates to Job Cards:</strong> Under <strong>My Template Groups</strong>, tap <strong>Load to List</strong> to instantly load a saved template into your active scan list, then tap <strong>Save to Job Card</strong>.</li>
-          <li><strong>Locations:</strong> Each part displays its bin location (e.g. <code>3A2</code>) so you can easily locate it in the store.</li>
-        </ul>
+        <h3>3. At the booking-out computer: scan the phone</h3>
+        <ol>
+          <li>Open the correct saved job card/template, or open the active list's generated barcodes.</li>
+          <li>In the barcode viewer, keep <strong>Show each barcode once per required quantity</strong> enabled if you need to scan each unit separately. Turn it off if one scan per part number is what your booking-out process expects.</li>
+          <li>Hold your phone screen steady and scan the displayed barcode with the computer's barcode scanner. The barcode encodes the part number, not the description or shelf location.</li>
+          <li>Use <strong>Prev</strong> and <strong>Next</strong> to move through the list. Confirm the booking-out system accepted each scan before moving on.</li>
+        </ol>
 
-        <h3>3. Active List & Terminal Integration</h3>
+        <h3>4. Helpful reminders</h3>
         <ul>
-          <li><strong>Screen Barcodes:</strong> Open any saved Job Card or Template, tap <strong> Screen Barcodes</strong>, and zap each large barcode directly off your phone screen using your wireless Zebra scanner.</li>
+          <li>Generated barcodes are a convenient substitute for manually typing the part number; they do not automatically transfer the list to the computer.</li>
+          <li>Your saved sets and history are stored in this browser on this phone. Use <strong>Backup data</strong> periodically, especially before changing phones or clearing browser data.</li>
+          <li>For printed labels, use <strong>Print Barcode Labels</strong> on a saved template. The printed sheets are optional; the normal workflow is to scan barcodes displayed on the phone.</li>
         </ul>
       </div>
 
@@ -407,8 +448,22 @@
   <div class="app-container">
     <div class="brand"><div class="brand-mark">PP</div><div><h1>Part Picker</h1><p>Parts collation, saved sets and barcode prep</p></div></div>
     
-    <!-- EMBEDDED USER GUIDE & SEARCH BUTTONS -->
-    <div class="quick-grid"><button class="quick-action quick-primary" onclick="openSearchModal()"><span class="svg-icon"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6"></circle><path d="m16 16 5 5"></path></svg></span>Search parts</button><button class="quick-action" onclick="openGuideModal()"><span class="svg-icon"><svg viewBox="0 0 24 24"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v16H6.5A2.5 2.5 0 0 0 4 21.5z"></path><path d="M4 5.5V21"></path></svg></span>How it works</button><button class="quick-action quick-success" onclick="exportAllData()"><span class="svg-icon"><svg viewBox="0 0 24 24"><path d="M12 3v12"></path><path d="m7 10 5 5 5-5"></path><path d="M5 21h14"></path></svg></span>Backup data</button><button class="quick-action quick-warning" onclick="document.getElementById('backup-file-input').click()"><span class="svg-icon"><svg viewBox="0 0 24 24"><path d="M12 21V9"></path><path d="m17 14-5-5-5 5"></path><path d="M5 3h14"></path></svg></span>Import JSON</button><button class="quick-action" onclick="exportActiveListCSV()">Export active list CSV</button><button class="quick-action" onclick="printActivePickingSheet()">Print picking sheet</button></div><input id="backup-file-input" type="file" accept="application/json,.json" style="display:none" onchange="importBackupFile(event)">
+    <!-- MOBILE-FIRST CORE ACTIONS: scan a shelf label, build a list, show generated barcodes -->
+    <div class="mobile-workflow-hint"><strong>Scan shelf part → Add to list → Show barcodes</strong><span>Generated barcodes contain the part number and can be scanned at the booking-out computer.</span></div>
+    <div class="quick-grid mobile-core-actions">
+      <button class="quick-action quick-primary" onclick="startScanner()"><span class="svg-icon"><svg viewBox="0 0 24 24"><path d="M3 5v14M6 5v14M9 5v14M13 5v14M16 5v14M19 5v14M22 5v14"></path></svg></span>Scan shelf barcode</button>
+      <button class="quick-action" onclick="openSearchModal()"><span class="svg-icon"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6"></circle><path d="m16 16 5 5"></path></svg></span>Find a part</button>
+    </div>
+    <details class="mobile-tools">
+      <summary>Backup and other tools</summary>
+      <div class="quick-grid">
+        <button class="quick-action" onclick="openGuideModal()">How it works</button>
+        <button class="quick-action quick-success" onclick="exportAllData()">Backup data</button>
+        <button class="quick-action quick-warning" onclick="document.getElementById('backup-file-input').click()">Import backup</button>
+        <button class="quick-action" onclick="exportActiveListCSV()">Export active list CSV</button>
+      </div>
+    </details>
+    <input id="backup-file-input" type="file" accept="application/json,.json" style="display:none" onchange="importBackupFile(event)">
     
     <div class="input-card" id="input-card">
       <!-- Top Row: Part Number, Location, Scan Button -->
@@ -418,7 +473,7 @@
           <input type="text" id="partNo" placeholder="" oninput="lookupPartData(this.value)">
         </div>
         <div class="loc-col">
-          <label for="loc">Location</label>
+          <label for="loc">Shelf location (optional)</label>
           <input type="text" id="loc" placeholder="" maxlength="10">
         </div>
         <div class="scan-col">
@@ -429,7 +484,7 @@
       
       <!-- Second Row: Item Description (Large Box) -->
       <div class="input-row">
-        <label for="desc">Item Description</label>
+        <label for="desc">Description (optional)</label>
         <input type="text" id="desc" placeholder="">
       </div>
 
@@ -475,9 +530,10 @@
 
     <!-- Main Actions -->
     <div id="action-buttons" style="display: none;">
-      <button class="btn btn-job-save" onclick="openJobPromptModal('save')">Save to Job Card</button>
-      <button class="btn btn-group-init" onclick="showActiveListBarcodes()"> Screen Barcodes</button>
-      <button class="btn btn-clear" onclick="clearAllLabels()">Clear Active List</button>
+      <button class="btn btn-group-init mobile-show-barcode" onclick="showActiveListBarcodes()">Show generated barcodes</button>
+      <button class="btn btn-job-save" onclick="saveActiveListAsTemplate()">Save this part set</button>
+      <button class="btn btn-job-save" onclick="openJobPromptModal('save')">Save as job card</button>
+      <button class="btn btn-clear" onclick="clearAllLabels()">Clear active list</button>
     </div>
 
     <!-- Job Cards Section (Collapsible) -->
@@ -819,9 +875,14 @@
           await stopScanner();
           if (!cleanText) { showNotification('Scanned barcode did not contain a valid part number.'); return; }
           document.getElementById('partNo').value = cleanText;
+          document.getElementById('loc').value = '';
+          document.getElementById('desc').value = '';
+          lastAutoDesc = '';
+          lastAutoLoc = '';
           lookupPartData(cleanText);
           if (navigator.vibrate) navigator.vibrate(100);
-          document.getElementById('loc').focus();
+          document.getElementById('add-btn').scrollIntoView({behavior:'smooth', block:'center'});
+          document.getElementById('add-btn').focus({preventScroll:true});
         }, () => {});
       } catch (err) {
         console.error('Camera error:', err);
@@ -858,7 +919,6 @@
       const qty = Number(rawQty);
 
       if(!partNo) { showNotification("Please enter a valid part number."); partNoInput.focus(); return; }
-      if(!desc) { showNotification("Please enter an item description."); descInput.focus(); return; }
       if (rawQty === '' || !Number.isInteger(qty) || qty < 1 || qty > 999) { showNotification('Quantity must be a whole number from 1 to 999.'); qtyInput.focus(); return; }
 
       if (editingId) {
