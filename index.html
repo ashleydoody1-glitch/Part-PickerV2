@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Part Picker | Field Inventory</title>
+  <title>Part Picker | Parts Collation & Barcode Prep</title>
   
   <!-- Standard & Mobile Web App Icons -->
   <link rel="icon" type="image/svg+xml" href="https://api.iconify.design/lucide:box.svg?color=%230056b3">
@@ -240,6 +240,26 @@
 
 /* Renovated visual system: original structure and functionality preserved. */
 :root{--primary:#0b5cab;--primary-dark:#074b8d;--secondary:#4f5f70;--success:#18864b;--warning:#e09a13;--danger:#c5353d;--info:#147f99;--bg:#eef3f8;--card-bg:#fff;--text:#142434}body{background:linear-gradient(180deg,#e9f2fc 0,#f5f8fb 310px);color:var(--text)}.app-container{max-width:720px;padding:22px 18px 52px}.brand{display:flex;align-items:center;gap:13px;margin:4px 0 20px}.brand-mark{width:46px;height:46px;border-radius:15px;display:grid;place-items:center;background:linear-gradient(135deg,#0b5cab,#1193ae);color:#fff;font-weight:900;box-shadow:0 8px 20px #0b5cab44}.brand h1{font-size:25px;margin:0;text-align:left;line-height:1.05}.brand p{margin:5px 0 0;color:#607184;font-size:12px;font-weight:600}.quick-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:20px}.quick-action{display:flex;align-items:center;gap:8px;text-align:left;background:#fff;color:#26394b;border:1px solid #dce6ef;box-shadow:0 3px 9px #1a3d5c12;padding:11px 12px;font-size:13px}.quick-primary{background:#e9f3ff;color:#07529b}.quick-success{background:#eaf8ef;color:#126b3a}.quick-warning{background:#fff7e6;color:#895900}.svg-icon{width:19px;height:19px;display:inline-flex;flex:none}.svg-icon svg{width:100%;height:100%;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.input-card,.scanned-list,.group-card{border:1px solid #dce6ef;box-shadow:0 6px 18px #173c5c12;border-radius:16px}.input-card{padding:18px;background:linear-gradient(145deg,#fff,#f9fcff)}input[type=text],input[type=number]{border:1px solid #cbd8e5;border-radius:9px}.btn,.btn-scan-trigger{border-radius:9px}.btn-search-top,.btn-guide-top{display:none}.list-header{font-size:15px;text-transform:uppercase;letter-spacing:.08em;color:#526477;margin-top:27px}.groups-section{border-top:0;padding-top:0}.group-card{padding:14px;background:#fff;border-left:5px solid #0b5cab}.job-card{border-left-color:#147f99}.group-actions{flex-wrap:wrap}.group-actions button{min-width:calc(50% - 4px)}.job-modal-content,.search-modal-content,.prompt-card{border-radius:18px}@media(max-width:420px){.app-container{padding:16px 12px 45px}.quick-grid{gap:7px}.quick-action{font-size:12px;padding:10px 9px}.group-actions button{min-width:100%}}
+
+    .repeat-qty-control{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:12px;font-size:13px;color:#33485c;font-weight:600}
+    .repeat-qty-control input{width:18px;height:18px}
+    #print-layout.print-picking-sheet{display:block;grid-template-columns:none;width:100%}
+    .picking-print-title{font-size:24px;margin:0 0 5px}
+    .picking-print-meta{font-size:12px;margin-bottom:14px;color:#444}
+    .picking-print-table{width:100%;border-collapse:collapse;font-size:12px}
+    .picking-print-table th,.picking-print-table td{border:1px solid #777;padding:7px;text-align:left;vertical-align:top}
+    .picking-print-table th{background:#eee}
+    .picking-print-table .check-cell{font-size:18px;text-align:center;width:70px}
+    @media print{
+      #print-layout.print-picking-sheet{display:block!important}
+      #print-layout.print-picking-sheet .picking-print-table{display:table}
+      #print-layout.print-picking-sheet .picking-print-title{display:block}
+      #print-layout.print-picking-sheet .picking-print-meta{display:block}
+      body:has(#print-layout.print-picking-sheet) #print-layout{display:block;}
+      body:has(#print-layout.print-picking-sheet) #print-layout .print-card{display:none}
+      body:has(#print-layout.print-picking-sheet) @page{size:A4 portrait}
+    }
+    @media print{#print-layout.print-picking-sheet{break-inside:auto}.picking-print-table tr{break-inside:avoid}}
   </style>
 </head>
 <body>
@@ -374,9 +394,8 @@
             <button class="btn-carousel" id="carousel-next" onclick="navigateCarousel(1)">Next </button>
           </div>
           
-          <div style="font-size: 12px; color: #666; margin-top: 5px; text-align: center;">
-            Zap each barcode with your Zebra scanner at the computer terminal.
-          </div>
+          <label class="repeat-qty-control"><input type="checkbox" id="repeat-qty-toggle" checked onchange="toggleQuantityBarcodeMode(this.checked)"> Show each barcode once per required quantity</label>
+          <div style="font-size: 12px; color: #666; margin-top: 5px; text-align: center;">Scan each displayed barcode into your booking-out system. Quantities are repeated when the option above is enabled.</div>
         </div>
       </div>
 
@@ -386,10 +405,10 @@
 
   <!-- MOBILE UI -->
   <div class="app-container">
-    <div class="brand"><div class="brand-mark">PP</div><div><h1>Part Picker</h1><p>Field inventory, job cards and barcode labels</p></div></div>
+    <div class="brand"><div class="brand-mark">PP</div><div><h1>Part Picker</h1><p>Parts collation, saved sets and barcode prep</p></div></div>
     
     <!-- EMBEDDED USER GUIDE & SEARCH BUTTONS -->
-    <div class="quick-grid"><button class="quick-action quick-primary" onclick="openSearchModal()"><span class="svg-icon"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6"></circle><path d="m16 16 5 5"></path></svg></span>Search parts</button><button class="quick-action" onclick="openGuideModal()"><span class="svg-icon"><svg viewBox="0 0 24 24"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v16H6.5A2.5 2.5 0 0 0 4 21.5z"></path><path d="M4 5.5V21"></path></svg></span>How it works</button><button class="quick-action quick-success" onclick="exportAllData()"><span class="svg-icon"><svg viewBox="0 0 24 24"><path d="M12 3v12"></path><path d="m7 10 5 5 5-5"></path><path d="M5 21h14"></path></svg></span>Backup data</button><button class="quick-action quick-warning" onclick="document.getElementById('backup-file-input').click()"><span class="svg-icon"><svg viewBox="0 0 24 24"><path d="M12 21V9"></path><path d="m17 14-5-5-5 5"></path><path d="M5 3h14"></path></svg></span>Import JSON</button></div><input id="backup-file-input" type="file" accept="application/json,.json" style="display:none" onchange="importBackupFile(event)">
+    <div class="quick-grid"><button class="quick-action quick-primary" onclick="openSearchModal()"><span class="svg-icon"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6"></circle><path d="m16 16 5 5"></path></svg></span>Search parts</button><button class="quick-action" onclick="openGuideModal()"><span class="svg-icon"><svg viewBox="0 0 24 24"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v16H6.5A2.5 2.5 0 0 0 4 21.5z"></path><path d="M4 5.5V21"></path></svg></span>How it works</button><button class="quick-action quick-success" onclick="exportAllData()"><span class="svg-icon"><svg viewBox="0 0 24 24"><path d="M12 3v12"></path><path d="m7 10 5 5 5-5"></path><path d="M5 21h14"></path></svg></span>Backup data</button><button class="quick-action quick-warning" onclick="document.getElementById('backup-file-input').click()"><span class="svg-icon"><svg viewBox="0 0 24 24"><path d="M12 21V9"></path><path d="m17 14-5-5-5 5"></path><path d="M5 3h14"></path></svg></span>Import JSON</button><button class="quick-action" onclick="exportActiveListCSV()">Export active list CSV</button><button class="quick-action" onclick="printActivePickingSheet()">Print picking sheet</button></div><input id="backup-file-input" type="file" accept="application/json,.json" style="display:none" onchange="importBackupFile(event)">
     
     <div class="input-card" id="input-card">
       <!-- Top Row: Part Number, Location, Scan Button -->
@@ -484,6 +503,7 @@
         </div>
       </div>
       <div class="scanned-list" id="groups-list-container" style="display: none; background: transparent; box-shadow: none; margin-bottom: 0;">
+        <input type="search" id="group-filter" class="group-filter" placeholder="Filter saved sets by name or part number…" aria-label="Filter saved templates" oninput="filterSavedGroups(this.value)" style="width:100%;box-sizing:border-box;margin:0 0 10px;padding:12px;border:1px solid #cbd8e5;border-radius:10px;font-size:16px;">
         <div id="groups-list">
           <!-- Groups render here -->
         </div>
@@ -537,7 +557,12 @@
     
     // Carousel state & toggle states (with localStorage persistence)
     let carouselItems = [];
+    let carouselSourceItems = [];
     let carouselIndex = 0;
+    let quantityBarcodeMode = true;
+    let lastLookupPart = "";
+    let lastAutoDesc = "";
+    let lastAutoLoc = "";
     let historyExpanded = safeParseStoredValue('historyExpanded', false) === true;
     let jobsExpanded = safeParseStoredValue('jobsExpanded', false) === true;
     let groupsExpanded = safeParseStoredValue('groupsExpanded', false) === true;
@@ -757,45 +782,24 @@
 
     // --- AUTO-LOOKUP DESCRIPTION & LOCATION LOGIC ---
     function lookupPartData(val) {
-      const cleanPart = val.toUpperCase().replace(/[^A-Z0-9\-]/g, '').trim();
-      if (!cleanPart) return;
-
+      const cleanPart = String(val || '').toUpperCase().replace(/[^A-Z0-9\-]/g, '').trim();
       const descInput = document.getElementById('desc');
       const locInput = document.getElementById('loc');
-      
-      let foundDesc = null;
-      let foundLoc = null;
-
-      const histMatch = scanHistory.find(h => h.partNo === cleanPart);
-      if (histMatch) { 
-        if (histMatch.desc && !descInput.value.trim()) foundDesc = histMatch.desc;
-        if (histMatch.loc && !locInput.value.trim()) foundLoc = histMatch.loc;
+      if (cleanPart !== lastLookupPart) {
+        if (lastAutoDesc && descInput.value === lastAutoDesc) descInput.value = '';
+        if (lastAutoLoc && locInput.value === lastAutoLoc) locInput.value = '';
+        lastAutoDesc = ''; lastAutoLoc = ''; lastLookupPart = cleanPart;
       }
-
-      if (!foundDesc || !foundLoc) {
-        for (const job of savedJobs) {
-          const itemMatch = job.items.find(i => i.partNo === cleanPart);
-          if (itemMatch) {
-            if (!foundDesc && itemMatch.desc) foundDesc = itemMatch.desc;
-            if (!foundLoc && itemMatch.loc) foundLoc = itemMatch.loc;
-            if (foundDesc && foundLoc) break;
-          }
-        }
+      if (!cleanPart) return;
+      let foundDesc = '', foundLoc = '';
+      const collections = [scanHistory, ...savedJobs.map(x => x.items || []), ...savedGroups.map(x => x.items || [])];
+      for (const collection of collections) {
+        const match = collection.find(item => item.partNo === cleanPart);
+        if (match) { if (!foundDesc && match.desc) foundDesc = match.desc; if (!foundLoc && match.loc) foundLoc = match.loc; }
+        if (foundDesc && foundLoc) break;
       }
-
-      if (!foundDesc || !foundLoc) {
-        for (const group of savedGroups) {
-          const itemMatch = group.items.find(i => i.partNo === cleanPart);
-          if (itemMatch) {
-            if (!foundDesc && itemMatch.desc) foundDesc = itemMatch.desc;
-            if (!foundLoc && itemMatch.loc) foundLoc = itemMatch.loc;
-            if (foundDesc && foundLoc) break;
-          }
-        }
-      }
-
-      if (foundDesc && !descInput.value.trim()) descInput.value = foundDesc;
-      if (foundLoc && !locInput.value.trim()) locInput.value = foundLoc;
+      if (foundDesc && !descInput.value.trim()) { descInput.value = foundDesc; lastAutoDesc = foundDesc; }
+      if (foundLoc && !locInput.value.trim()) { locInput.value = foundLoc; lastAutoLoc = foundLoc; }
     }
 
     // --- CAMERA SCANNER (With BarcodeDetector for Orange Labels) ---
@@ -1200,8 +1204,11 @@
       document.getElementById('job-modal-title').innerText = title;
       document.getElementById('job-modal-date').innerText = dateStr;
       
-      carouselItems = items;
-      carouselIndex = 0;
+      carouselSourceItems = Array.isArray(items) ? items.map(item => ({...item})) : [];
+      quantityBarcodeMode = true;
+      const repeatToggle = document.getElementById('repeat-qty-toggle');
+      if (repeatToggle) repeatToggle.checked = true;
+      rebuildQuantityCarousel();
       
       const listContainer = document.getElementById('job-modal-list');
       listContainer.innerHTML = '';
@@ -1264,8 +1271,8 @@
         locContainer.style.display = 'none';
       }
 
-      document.getElementById('carousel-part-desc').innerText = (currentItem.oos ? '[ON ORDER] ' : '') + (currentItem.desc || 'NO DESCRIPTION');
-      document.getElementById('carousel-counter').innerText = `${carouselIndex + 1} of ${carouselItems.length}`;
+      document.getElementById('carousel-part-desc').innerText = (currentItem.oos ? '[ON ORDER] ' : '') + (currentItem.desc || 'NO DESCRIPTION') + (quantityBarcodeMode && currentItem._scanQty > 1 ? ` · copy ${currentItem._scanOrdinal} of ${currentItem._scanQty}` : '');
+      document.getElementById('carousel-counter').innerText = `${carouselIndex + 1} of ${carouselItems.length} scans`;
 
       document.getElementById('carousel-prev').disabled = (carouselIndex === 0);
       document.getElementById('carousel-next').disabled = (carouselIndex === carouselItems.length - 1);
@@ -1289,7 +1296,24 @@
     function closeJobModal() { 
       document.getElementById('job-modal').style.display = 'none'; 
       carouselItems = [];
+      carouselSourceItems = [];
       carouselIndex = 0;
+    }
+
+    function rebuildQuantityCarousel() {
+      carouselItems = [];
+      (carouselSourceItems || []).forEach(item => {
+        const qty = validQty(item.qty);
+        const repetitions = quantityBarcodeMode ? qty : 1;
+        for (let i = 1; i <= repetitions; i++) carouselItems.push({...item, _scanOrdinal: i, _scanQty: qty});
+      });
+      carouselIndex = Math.min(carouselIndex, Math.max(0, carouselItems.length - 1));
+      renderCarouselItem();
+    }
+
+    function toggleQuantityBarcodeMode(enabled) {
+      quantityBarcodeMode = enabled === true;
+      rebuildQuantityCarousel();
     }
 
     function deleteJob(id) {
@@ -1333,6 +1357,7 @@
       const group = savedGroups.find(g => g.id === groupId);
       if (!group || !Array.isArray(group.items) || group.items.length === 0) return;
       const printContainer = document.getElementById('print-layout');
+      printContainer.className = '';
       printContainer.replaceChildren();
       for (const item of group.items) {
         const count = validQty(item.qty);
@@ -1472,14 +1497,17 @@
         savedGroups.forEach(group => {
           const totalGroupQty = group.items.reduce((sum, item) => sum + (parseInt(item.qty) || 1), 0);
           groupsList.innerHTML += `
-            <div class="group-card">
+            <div class="group-card" data-search="${escapeHTML(group.name + ' ' + group.items.map(item => item.partNo + ' ' + (item.desc || '') + ' ' + (item.loc || '')).join(' '))}">
               <div class="group-header">
                 <div><span class="group-title">${escapeHTML(group.name)}</span> <span class="group-count">${totalGroupQty} items</span></div>
               </div>
               <div class="group-actions">
                 <button class="btn-load" onclick="loadTemplateToList('${group.id}')">Load to List</button>
-                <button class="btn-barcode-group" onclick="viewGroupBarcodes('${group.id}')">Barcodes</button>
-                <button class="btn-print-group" onclick="printGroup('${group.id}')">Print</button>
+                <button class="btn-barcode-group" onclick="viewGroupBarcodes('${group.id}')">Screen Barcodes</button>
+                <button class="btn-print-group" onclick="printGroup('${group.id}')">Print Barcode Labels</button>
+                <button class="btn-action edit" onclick="printGroupPickingSheet('${group.id}')">Picking Sheet</button>
+                <button class="btn-action edit" onclick="duplicateGroup('${group.id}')">Duplicate</button>
+                <button class="btn-action edit" onclick="exportGroupCSV('${group.id}')">Export CSV</button>
                 <button class="btn-edit-group" onclick="loadContextToWorkbench('group', '${group.id}')">Edit</button>
                 <button class="btn-delete-group" onclick="deleteGroup('${group.id}')">Delete</button>
               </div>
@@ -1515,7 +1543,101 @@
       } else {
         historySection.style.display = 'none';
       }
+      const savedGroupFilter = document.getElementById('group-filter');
+      if (savedGroupFilter) filterSavedGroups(savedGroupFilter.value, false);
     }
+
+    // Saved-set utilities focused on parts collation, not stock management.
+    function filterSavedGroups(value, expandWhenFiltering = true) {
+      const query = String(value || '').trim().toLowerCase();
+      const cards = document.querySelectorAll('#groups-list .group-card');
+      cards.forEach(card => {
+        const text = (card.dataset.search || card.textContent || '').toLowerCase();
+        card.style.display = !query || text.includes(query) ? '' : 'none';
+      });
+      if (query && expandWhenFiltering && !groupsExpanded) {
+        groupsExpanded = true;
+        persist('groupsExpanded', true);
+        document.getElementById('groups-list-container').style.display = 'block';
+      }
+    }
+
+    function duplicateGroup(groupId) {
+      const group = savedGroups.find(g => g.id === groupId);
+      if (!group) return;
+      const suggested = `${group.name} COPY`;
+      const name = prompt('Name for the duplicated set:', suggested);
+      if (name === null) return;
+      if (!name.trim()) { showNotification('Please enter a name for the set.'); return; }
+      const copy = {id: 'group_' + Date.now().toString(), name: name.trim().toUpperCase(), items: group.items.map(item => ({partNo:item.partNo, desc:item.desc || '', loc:item.loc || '', qty:validQty(item.qty), oos:false}))};
+      savedGroups.unshift(copy);
+      if (!saveGroupsData()) return;
+      groupsExpanded = true; persist('groupsExpanded', true);
+      renderUI();
+      showNotification(`Duplicated set as "${copy.name}".`);
+    }
+
+    function downloadTextFile(filename, content, mime = 'text/plain;charset=utf-8') {
+      const blob = new Blob([content], {type:mime});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a'); a.href = url; a.download = filename;
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    }
+
+    function csvCell(value) { return '"' + String(value ?? '').replace(/"/g, '""') + '"'; }
+    function itemsToCSV(items) {
+      const rows = [['Part Number','Description','Location','Quantity']];
+      (items || []).forEach(item => rows.push([item.partNo, item.desc || '', item.loc || '', validQty(item.qty)]));
+      return '\uFEFF' + rows.map(row => row.map(csvCell).join(',')).join('\r\n');
+    }
+    function exportGroupCSV(groupId) {
+      const group = savedGroups.find(g => g.id === groupId); if (!group) return;
+      downloadTextFile(`${safeFilename(group.name)}-parts.csv`, itemsToCSV(group.items), 'text/csv;charset=utf-8');
+      showNotification('Saved set exported as CSV.');
+    }
+    function exportActiveListCSV() {
+      if (!labels.length) { showNotification('The active list is empty.'); return; }
+      downloadTextFile('active-parts-list.csv', itemsToCSV(labels), 'text/csv;charset=utf-8');
+      showNotification('Active list exported as CSV.');
+    }
+    function safeFilename(value) { return String(value || 'parts').normalize('NFKD').replace(/[^A-Za-z0-9_-]+/g, '-').replace(/^-+|-+$/g, '').slice(0,80) || 'parts'; }
+
+    function printGroupPickingSheet(groupId) {
+      const group = savedGroups.find(g => g.id === groupId); if (!group || !group.items.length) return;
+      printPickingSheet(group.name, group.items);
+    }
+    function printActivePickingSheet() {
+      if (!labels.length) { showNotification('The active list is empty.'); return; }
+      printPickingSheet('Active Parts List', labels);
+    }
+    function printPickingSheet(title, items) {
+      const container = document.getElementById('print-layout');
+      container.replaceChildren();
+      container.className = 'print-picking-sheet';
+      const heading = document.createElement('h1'); heading.className = 'picking-print-title'; heading.textContent = title; container.appendChild(heading);
+      const meta = document.createElement('div'); meta.className = 'picking-print-meta'; meta.textContent = `Prepared ${new Date().toLocaleString()} · ${items.reduce((sum, item) => sum + validQty(item.qty), 0)} total parts`; container.appendChild(meta);
+      const table = document.createElement('table'); table.className = 'picking-print-table';
+      const thead = document.createElement('thead'); const hr = document.createElement('tr');
+      ['Collected','Part Number','Description','Location','Qty'].forEach(label => { const th=document.createElement('th'); th.textContent=label; hr.appendChild(th); }); thead.appendChild(hr); table.appendChild(thead);
+      const tbody = document.createElement('tbody');
+      items.forEach(item => { const tr=document.createElement('tr'); ['☐', item.partNo, item.desc || '', item.loc || '', String(validQty(item.qty))].forEach((value, i) => { const td=document.createElement('td'); td.textContent=value; if(i===0) td.className='check-cell'; tr.appendChild(td); }); tbody.appendChild(tr); });
+      table.appendChild(tbody); container.appendChild(table);
+      requestAnimationFrame(() => requestAnimationFrame(() => { try { window.print(); } catch(e) { showNotification('Unable to open print dialog.'); } }));
+      setTimeout(() => { container.className = ''; }, 500);
+    }
+
+    // Keyboard shortcuts for fast desktop use: Ctrl/Cmd+K search, Ctrl/Cmd+Shift+P screen barcodes, Escape closes overlays.
+    document.addEventListener('keydown', event => {
+      const target = event.target;
+      const typing = target && (['INPUT','TEXTAREA','SELECT'].includes(target.tagName) || target.isContentEditable);
+      if (event.key === 'Escape') {
+        ['scanner-modal','job-modal','guide-modal','search-modal','job-prompt-modal','custom-confirm-modal'].forEach(id => { const el=document.getElementById(id); if (el && getComputedStyle(el).display !== 'none') { if(id==='scanner-modal') stopScanner(); else el.style.display='none'; } });
+        return;
+      }
+      if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'k') { event.preventDefault(); openSearchModal(); return; }
+      if ((event.ctrlKey || event.metaKey) && event.shiftKey && event.key.toLowerCase() === 'p' && !typing) { event.preventDefault(); showActiveListBarcodes(); }
+    });
   </script>
 </body>
 </html>
