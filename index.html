@@ -598,6 +598,12 @@
     function escapeHTML(value) {
       return String(value ?? '').replace(/[&<>\"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":'&#39;'}[ch]));
     }
+    // Values passed through inline handlers are URI-encoded; decode them before
+    // putting them back into form fields. Fall back safely if older data is malformed.
+    function safeDecodeURIComponent(value) {
+      try { return decodeURIComponent(String(value ?? '')); }
+      catch (_) { return String(value ?? ''); }
+    }
     function safeId(value, fallback = '') {
       const id = String(value ?? '');
       return /^[A-Za-z0-9_-]{1,100}$/.test(id) ? id : fallback;
@@ -818,8 +824,8 @@
 
     function addFromSearch(partNo, desc, loc) {
       document.getElementById('partNo').value = partNo;
-      document.getElementById('loc').value = loc || '';
-      document.getElementById('desc').value = desc;
+      document.getElementById('loc').value = safeDecodeURIComponent(loc || '');
+      document.getElementById('desc').value = safeDecodeURIComponent(desc || '');
       document.getElementById('itemQty').value = "1";
       addOrUpdateLabel();
       closeSearchModal();
@@ -1031,8 +1037,8 @@
 
     function addFromHistory(partNo, desc, loc) {
       document.getElementById('partNo').value = partNo;
-      document.getElementById('loc').value = loc || '';
-      document.getElementById('desc').value = desc;
+      document.getElementById('loc').value = safeDecodeURIComponent(loc || '');
+      document.getElementById('desc').value = safeDecodeURIComponent(desc || '');
       document.getElementById('itemQty').value = "1";
       addOrUpdateLabel();
       window.scrollTo({ top: 0, behavior: 'smooth' });
