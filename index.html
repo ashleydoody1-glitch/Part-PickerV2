@@ -286,7 +286,10 @@
     #carousel-barcode-svg{max-width:100%;height:auto}
     @media(max-width:480px){.app-container{padding:12px!important}.brand h1{font-size:23px}.input-row-top{gap:8px}.mobile-core-actions{gap:8px}.mobile-core-actions .quick-action{padding:10px 7px}.mobile-workflow-hint{font-size:13px}.mobile-show-barcode{position:sticky;bottom:8px;z-index:3}}
 
-  </style>
+  
+    /* Use normal title-style button labels; avoid forcing all letters to uppercase. */
+
+</style>
 </head>
 <body>
 
@@ -372,8 +375,8 @@
         <h3>2. Check and save your part set</h3>
         <ul>
           <li>Review the <strong>Active Scan List</strong> and correct any part number, quantity or description before using the barcodes.</li>
-          <li>Tap <strong>Show generated barcodes</strong> to display the active list as barcodes on your phone.</li>
-          <li>Tap <strong>Save this part set</strong> for a reusable template, or <strong>Save as job card</strong> to save it under a job/bus number. Saved sets can be loaded again later.</li>
+          <li>Tap <strong>Show Generated Barcodes</strong> to display the active list as barcodes on your phone.</li>
+          <li>Tap <strong>Save This Part Set</strong> for a reusable template, or <strong>Save As Job Card</strong> to save it under a job/bus number. Saved sets can be loaded again later.</li>
           <li>Use <strong>Find a part</strong> or the saved-set filter to find previously used parts and templates.</li>
         </ul>
 
@@ -530,10 +533,10 @@
 
     <!-- Main Actions -->
     <div id="action-buttons" style="display: none;">
-      <button class="btn btn-group-init mobile-show-barcode" onclick="showActiveListBarcodes()">Show generated barcodes</button>
-      <button class="btn btn-job-save" onclick="saveActiveListAsTemplate()">Save this part set</button>
-      <button class="btn btn-job-save" onclick="openJobPromptModal('save')">Save as job card</button>
-      <button class="btn btn-clear" onclick="clearAllLabels()">Clear active list</button>
+      <button class="btn btn-group-init mobile-show-barcode" onclick="showActiveListBarcodes()">Show Generated Barcodes</button>
+      <button class="btn btn-job-save" onclick="saveActiveListAsTemplate()">Save This Part Set</button>
+      <button class="btn btn-job-save" onclick="openJobPromptModal('save')">Save As Job Card</button>
+      <button class="btn btn-clear" onclick="clearAllLabels()">Clear Active List</button>
     </div>
 
     <!-- Job Cards Section (Collapsible) -->
@@ -555,7 +558,6 @@
         <span id="groups-title-text" onclick="toggleGroups()" style="cursor: pointer; flex-grow: 1;">My Template Groups </span>
         <div style="display:flex; align-items:center; gap:8px;">
           <span style="background: var(--primary); color: white; padding: 2px 8px; border-radius: 12px; font-size: 14px;" id="groups-count-badge">0</span>
-          <button class="btn-action edit" onclick="saveActiveListAsTemplate()" style="font-weight:bold; border-color:var(--primary); color:var(--primary); padding: 4px 10px;">+ Save Current List</button>
         </div>
       </div>
       <div class="scanned-list" id="groups-list-container" style="display: none; background: transparent; box-shadow: none; margin-bottom: 0;">
@@ -1280,7 +1282,7 @@
       listContainer.innerHTML = '';
       
       items.forEach(item => {
-        const oosBadge = item.oos ? '<span class="oos-badge">ON ORDER</span>' : '';
+        const oosBadge = item.oos ? '<span class="oos-badge">On Order</span>' : '';
         const locBadge = item.loc ? `<span class="loc-badge"> ${escapeHTML(item.loc)}</span>` : '';
         const qtyDisplay = (item.qty && item.qty > 1) ? ` <span style="background:#e2e8f0; padding:1px 6px; border-radius:8px; font-size:12px;">x${item.qty}</span>` : '';
         listContainer.innerHTML += `
@@ -1337,7 +1339,7 @@
         locContainer.style.display = 'none';
       }
 
-      document.getElementById('carousel-part-desc').innerText = (currentItem.oos ? '[ON ORDER] ' : '') + (currentItem.desc || 'NO DESCRIPTION') + (quantityBarcodeMode && currentItem._scanQty > 1 ? ` · copy ${currentItem._scanOrdinal} of ${currentItem._scanQty}` : '');
+      document.getElementById('carousel-part-desc').innerText = (currentItem.oos ? '[On Order] ' : '') + (currentItem.desc || 'NO DESCRIPTION') + (quantityBarcodeMode && currentItem._scanQty > 1 ? ` · copy ${currentItem._scanOrdinal} of ${currentItem._scanQty}` : '');
       document.getElementById('carousel-counter').innerText = `${carouselIndex + 1} of ${carouselItems.length} scans`;
 
       document.getElementById('carousel-prev').disabled = (carouselIndex === 0);
@@ -1479,7 +1481,7 @@
       } else {
         labels.forEach((label) => {
           const showOosFeature = (contextEditing && contextEditing.type === 'job') || !contextEditing;
-          const oosBadge = (showOosFeature && label.oos) ? '<span class="oos-badge">ON ORDER</span>' : '';
+          const oosBadge = (showOosFeature && label.oos) ? '<span class="oos-badge">On Order</span>' : '';
           const locBadge = label.loc ? `<span class="loc-badge"> ${escapeHTML(label.loc)}</span>` : '';
           const oosBtnClass = label.oos ? 'btn-action oos active' : 'btn-action oos';
           const oosBtnText = label.oos ? 'Ordered' : 'On Order';
@@ -1581,7 +1583,7 @@
           `;
         });
       } else {
-        groupsList.innerHTML = '<div class="empty-state">No template groups saved yet. Click "+ Save Current List" above to create one.</div>';
+        groupsList.innerHTML = '<div class="empty-state">No template groups saved yet. Add parts to the active list, then tap Save This Part Set.</div>';
       }
 
       // Scan History
