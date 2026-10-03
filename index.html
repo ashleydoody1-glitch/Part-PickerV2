@@ -62,8 +62,7 @@
       
       .input-row-top { display: flex; gap: 8px; margin-bottom: 16px; align-items: flex-end; }
       .part-col { flex-grow: 1; }
-      .loc-col { width: 85px; flex-shrink: 0; }
-      .scan-col { width: 85px; flex-shrink: 0; }
+      .loc-col { width: 130px; flex-shrink: 0; }
 
       .input-row { margin-bottom: 16px; }
       .input-row-split { display: flex; gap: 10px; margin-bottom: 16px; align-items: flex-end; }
@@ -73,7 +72,6 @@
       input[type="text"] { text-transform: uppercase; }
       input[type="text"]:focus, input[type="number"]:focus { outline: none; border-color: var(--primary); }
       
-      .btn-scan-trigger { background-color: var(--text); color: white; border: none; border-radius: 6px; padding: 12px 0; font-weight: bold; cursor: pointer; width: 100%; display: flex; align-items: center; justify-content: center; font-size: 14px; white-space: nowrap; height: 48px; box-sizing: border-box; }
 
       .btn { display: block; width: 100%; padding: 14px; background-color: var(--primary); color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; transition: all 0.2s; }
       .btn:active { opacity: 0.8; }
@@ -246,7 +244,7 @@
     }
 
 /* Renovated visual system: original structure and functionality preserved. */
-:root{--primary:#0b5cab;--primary-dark:#074b8d;--secondary:#4f5f70;--success:#18864b;--warning:#e09a13;--danger:#c5353d;--info:#147f99;--bg:#eef3f8;--card-bg:#fff;--text:#142434}body{background:linear-gradient(180deg,#e9f2fc 0,#f5f8fb 310px);color:var(--text)}.app-container{max-width:720px;padding:22px 18px 52px}.brand{display:flex;align-items:center;gap:13px;margin:4px 0 20px}.brand-mark{width:46px;height:46px;border-radius:15px;display:grid;place-items:center;background:linear-gradient(135deg,#0b5cab,#1193ae);color:#fff;font-weight:900;box-shadow:0 8px 20px #0b5cab44}.brand h1{font-size:25px;margin:0;text-align:left;line-height:1.05}.brand p{margin:5px 0 0;color:#607184;font-size:12px;font-weight:600}.quick-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:20px}.quick-action{display:flex;align-items:center;gap:8px;text-align:left;background:#fff;color:#26394b;border:1px solid #dce6ef;box-shadow:0 3px 9px #1a3d5c12;padding:11px 12px;font-size:13px}.quick-primary{background:#e9f3ff;color:#07529b}.quick-success{background:#eaf8ef;color:#126b3a}.quick-warning{background:#fff7e6;color:#895900}.svg-icon{width:19px;height:19px;display:inline-flex;flex:none}.svg-icon svg{width:100%;height:100%;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.input-card,.scanned-list,.group-card{border:1px solid #dce6ef;box-shadow:0 6px 18px #173c5c12;border-radius:16px}.input-card{padding:18px;background:linear-gradient(145deg,#fff,#f9fcff)}input[type=text],input[type=number]{border:1px solid #cbd8e5;border-radius:9px}.btn,.btn-scan-trigger{border-radius:9px}.btn-search-top,.btn-guide-top{display:none}.list-header{font-size:15px;text-transform:uppercase;letter-spacing:.08em;color:#526477;margin-top:27px}.groups-section{border-top:0;padding-top:0}.group-card{padding:14px;background:#fff;border-left:5px solid #0b5cab}.job-card{border-left-color:#147f99}.group-actions{flex-wrap:wrap}.group-actions button{min-width:calc(50% - 4px)}.job-modal-content,.search-modal-content,.prompt-card{border-radius:18px}@media(max-width:420px){.app-container{padding:16px 12px 45px}.quick-grid{gap:7px}.quick-action{font-size:12px;padding:10px 9px}.group-actions button{min-width:100%}}
+:root{--primary:#0b5cab;--primary-dark:#074b8d;--secondary:#4f5f70;--success:#18864b;--warning:#e09a13;--danger:#c5353d;--info:#147f99;--bg:#eef3f8;--card-bg:#fff;--text:#142434}body{background:linear-gradient(180deg,#e9f2fc 0,#f5f8fb 310px);color:var(--text)}.app-container{max-width:720px;padding:22px 18px 52px}.brand{display:flex;align-items:center;gap:13px;margin:4px 0 20px}.brand-mark{width:46px;height:46px;border-radius:15px;display:grid;place-items:center;background:linear-gradient(135deg,#0b5cab,#1193ae);color:#fff;font-weight:900;box-shadow:0 8px 20px #0b5cab44}.brand h1{font-size:25px;margin:0;text-align:left;line-height:1.05}.brand p{margin:5px 0 0;color:#607184;font-size:12px;font-weight:600}.quick-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:20px}.quick-action{display:flex;align-items:center;gap:8px;text-align:left;background:#fff;color:#26394b;border:1px solid #dce6ef;box-shadow:0 3px 9px #1a3d5c12;padding:11px 12px;font-size:13px}.quick-primary{background:#e9f3ff;color:#07529b}.quick-success{background:#eaf8ef;color:#126b3a}.quick-warning{background:#fff7e6;color:#895900}.svg-icon{width:19px;height:19px;display:inline-flex;flex:none}.svg-icon svg{width:100%;height:100%;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.input-card,.scanned-list,.group-card{border:1px solid #dce6ef;box-shadow:0 6px 18px #173c5c12;border-radius:16px}.input-card{padding:18px;background:linear-gradient(145deg,#fff,#f9fcff)}input[type=text],input[type=number]{border:1px solid #cbd8e5;border-radius:9px}.btn{border-radius:9px}.btn-search-top,.btn-guide-top{display:none}.list-header{font-size:15px;text-transform:uppercase;letter-spacing:.08em;color:#526477;margin-top:27px}.groups-section{border-top:0;padding-top:0}.group-card{padding:14px;background:#fff;border-left:5px solid #0b5cab}.job-card{border-left-color:#147f99}.group-actions{flex-wrap:wrap}.group-actions button{min-width:calc(50% - 4px)}.job-modal-content,.search-modal-content,.prompt-card{border-radius:18px}@media(max-width:420px){.app-container{padding:16px 12px 45px}.quick-grid{gap:7px}.quick-action{font-size:12px;padding:10px 9px}.loc-col{width:105px}.group-actions button{min-width:100%}}
 
     .repeat-qty-control{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:12px;font-size:13px;color:#33485c;font-weight:600}
     .repeat-qty-control input{width:18px;height:18px}
@@ -278,7 +276,7 @@
     .mobile-show-barcode{font-size:18px!important;min-height:58px;width:100%;box-shadow:0 3px 0 rgba(0,0,0,.08)}
     #partNo{font-size:18px!important;font-weight:700;letter-spacing:.3px}
     #itemQty{font-size:18px!important;min-height:48px}
-    #add-btn,.btn-scan-trigger{min-height:52px;font-size:17px}
+    #add-btn{min-height:52px;font-size:17px}
     .list-header{margin-top:22px}
     #job-modal{padding:10px!important}
     #job-modal .job-modal-content{width:100%;max-width:100%;border-radius:16px}
@@ -365,7 +363,7 @@
 
         <h3>1. At the shelf: capture the part number</h3>
         <ol>
-          <li>Tap <strong>Scan shelf barcode</strong> (or the smaller <strong>Scan</strong> button beside the Part Number field).</li>
+          <li>Tap <strong>Scan Shelf Barcode</strong> near the top of the screen. This is the single camera-scan button.</li>
           <li>Allow camera access if prompted, then point the phone camera at the barcode on the shelf/part.</li>
           <li>Check the Part Number field. If the shelf barcode cannot be read, type the part number manually instead.</li>
           <li>Optionally add a shelf location or description, and set <strong>Qty</strong> to the number of times that part needs to be booked out.</li>
@@ -469,7 +467,7 @@
     <input id="backup-file-input" type="file" accept="application/json,.json" style="display:none" onchange="importBackupFile(event)">
     
     <div class="input-card" id="input-card">
-      <!-- Top Row: Part Number, Location, Scan Button -->
+      <!-- Top Row: Part Number and optional shelf location -->
       <div class="input-row-top">
         <div class="part-col">
           <label for="partNo">Part Number</label>
@@ -478,10 +476,6 @@
         <div class="loc-col">
           <label for="loc">Shelf location (optional)</label>
           <input type="text" id="loc" placeholder="" maxlength="10">
-        </div>
-        <div class="scan-col">
-          <label>&nbsp;</label>
-          <button class="btn-scan-trigger" onclick="startScanner()" type="button"> Scan</button>
         </div>
       </div>
       
