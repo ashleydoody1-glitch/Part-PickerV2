@@ -13,7 +13,7 @@
   <link rel="manifest" href='data:application/manifest+json,{"name":"Part Picker","short_name":"PartPicker","start_url":".","display":"standalone","background_color":"#f4f7f6","theme_color":"#0056b3","icons":[{"src":"https://api.iconify.design/lucide:box.svg?color=%230056b3","sizes":"192x192","type":"image/svg+xml"}]}'>
   <meta name="theme-color" content="#0056b3">
 
-  <!-- JsBarcode for generating A4 print sheets and screen barcodes -->
+  <!-- JsBarcode for generating printable barcode labels and screen barcodes -->
   <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
   <!-- Html5-Qrcode for scanning barcodes via camera -->
   <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
@@ -237,11 +237,6 @@
       .print-desc { font-size: 8pt; font-weight: bold; text-transform: uppercase; margin-bottom: auto; max-width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
       .barcode-wrapper { margin-top: 2mm; width: 100%; min-width: 0; display: flex; justify-content: center; align-items: center; overflow: hidden; }
       .barcode-wrapper svg { display: block; height: auto; max-height: 16mm; max-width: 100%; background: #fff; overflow: hidden; }
-      #print-layout.print-picking-sheet { display: block !important; }
-      #print-layout.print-picking-sheet .print-card { display: none !important; }
-      #print-layout.print-picking-sheet .picking-print-table { display: table; }
-      #print-layout.print-picking-sheet .picking-print-title,
-      #print-layout.print-picking-sheet .picking-print-meta { display: block; }
     }
 
 /* Renovated visual system: original structure and functionality preserved. */
@@ -249,22 +244,6 @@
 
     .repeat-qty-control{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:12px;font-size:13px;color:#33485c;font-weight:600}
     .repeat-qty-control input{width:18px;height:18px}
-    #print-layout.print-picking-sheet{display:block;grid-template-columns:none;width:100%}
-    .picking-print-title{font-size:24px;margin:0 0 5px}
-    .picking-print-meta{font-size:12px;margin-bottom:14px;color:#444}
-    .picking-print-table{width:100%;border-collapse:collapse;font-size:12px}
-    .picking-print-table th,.picking-print-table td{border:1px solid #777;padding:7px;text-align:left;vertical-align:top}
-    .picking-print-table th{background:#eee}
-    .picking-print-table .check-cell{font-size:18px;text-align:center;width:70px}
-    @media print{
-      #print-layout.print-picking-sheet{display:block!important}
-      #print-layout.print-picking-sheet .picking-print-table{display:table}
-      #print-layout.print-picking-sheet .picking-print-title{display:block}
-      #print-layout.print-picking-sheet .picking-print-meta{display:block}
-      body:has(#print-layout.print-picking-sheet) #print-layout{display:block;}
-      body:has(#print-layout.print-picking-sheet) #print-layout .print-card{display:none}
-    }
-    @media print{#print-layout.print-picking-sheet{break-inside:auto}.picking-print-table tr{break-inside:avoid}}
 
     /* Mobile-first workflow: large touch targets and minimal secondary controls */
     .mobile-workflow-hint{background:#eaf3ff;border:1px solid #bfd8f7;border-radius:14px;padding:13px 14px;margin:12px 0 14px;display:flex;flex-direction:column;gap:5px;color:#163a63;font-size:14px;line-height:1.4}
@@ -407,7 +386,7 @@
           <li>Generated barcodes are a convenient substitute for manually typing the part number; they do not automatically transfer the list to the computer.</li>
           <li>Your saved sets and history are stored in this browser on this phone. Use <strong>Backup data</strong> periodically, especially before changing phones or clearing browser data.</li>
           <li>Open <strong>Settings</strong> to control automatic scan-to-list, sound, vibration and the barcode screen wake-lock behaviour.</li>
-          <li>For printed labels, use <strong>Print Barcode Labels</strong> on a saved template. The printed sheets are optional; the normal workflow is to scan barcodes displayed on the phone.</li>
+          <li>For printed labels, use <strong>Print Barcode Labels</strong> on a saved template when a physical set is useful. For normal jobs, scan the barcodes displayed on the phone.</li>
         </ul>
       </div>
 
@@ -458,7 +437,7 @@
         </div>
       </div>
 
-      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px"><button class="btn-close-modal" style="flex:1" onclick="closeJobModal()">Close Viewer</button><button class="btn-clear" style="flex:1" onclick="finishBarcodeSession()">Finished — Clear List</button></div>
+      <button class="btn-close-modal" onclick="closeJobModal()">Close Viewer</button>
     </div>
   </div>
 
@@ -478,7 +457,6 @@
         <button class="quick-action quick-success" onclick="exportAllData()">Backup data</button>
         <button class="quick-action quick-warning" onclick="document.getElementById('backup-file-input').click()">Import backup</button>
         <button class="quick-action" onclick="exportActiveListCSV()">Export active list CSV</button>
-        <button class="quick-action" onclick="printActivePickingSheet()">Print Picking Sheet</button>
         <button class="quick-action" onclick="openSettingsModal()">Settings</button>
         <button class="quick-action" onclick="openLastUsedGroup()">Last Used Set</button>
       </div>
@@ -549,8 +527,6 @@
     <!-- Main Actions -->
     <div id="action-buttons" style="display: none;">
       <button class="btn btn-group-init mobile-show-barcode" onclick="showActiveListBarcodes()">Generate Barcodes</button>
-      <button class="btn btn-job-save" onclick="startScanner()">Scan Next Part</button>
-      <button class="btn btn-job-save" onclick="printActivePickingSheet()">Print Picking Sheet</button>
       <button class="btn btn-job-save" onclick="saveActiveListAsTemplate()">Save This Part Set</button>
       <button class="btn btn-job-save" onclick="openJobPromptModal('save')">Save As Job Card</button>
       <button class="btn btn-clear" onclick="clearAllLabels()">Clear Active List</button>
@@ -1404,7 +1380,6 @@
       }
     }
 
-    function finishBarcodeSession(){ showCustomConfirm('Finished with this barcode session? The active list will be cleared.',()=>{ closeJobModal(); labels=[]; contextEditing=null; persist('editingContext',null); saveData(); renderUI(); showNotification('Booking-out list cleared.'); }); }
 
     function closeJobModal() { 
       document.getElementById('job-modal').style.display = 'none';
@@ -1627,7 +1602,6 @@
                 <button class="btn-load" onclick="loadTemplateToList('${group.id}')">Load to List</button>
                 <button class="btn-barcode-group" onclick="viewGroupBarcodes('${group.id}')">Screen Barcodes</button>
                 <button class="btn-print-group" onclick="printGroup('${group.id}')">Print Barcode Labels</button>
-                <button class="btn-action edit" onclick="printGroupPickingSheet('${group.id}')">Picking Sheet</button>
                 <button class="btn-action edit" onclick="duplicateGroup('${group.id}')">Duplicate</button>
                 <button class="btn-action edit" onclick="exportGroupCSV('${group.id}')">Export CSV</button>
                 <button class="btn-edit-group" onclick="loadContextToWorkbench('group', '${group.id}')">Edit</button>
@@ -1726,29 +1700,6 @@
     }
     function safeFilename(value) { return String(value || 'parts').normalize('NFKD').replace(/[^A-Za-z0-9_-]+/g, '-').replace(/^-+|-+$/g, '').slice(0,80) || 'parts'; }
 
-    function printGroupPickingSheet(groupId) {
-      const group = savedGroups.find(g => g.id === groupId); if (!group || !group.items.length) return;
-      printPickingSheet(group.name, group.items);
-    }
-    function printActivePickingSheet() {
-      if (!labels.length) { showNotification('The active list is empty.'); return; }
-      printPickingSheet('Active Parts List', labels);
-    }
-    function printPickingSheet(title, items) {
-      const container = document.getElementById('print-layout');
-      container.replaceChildren();
-      container.className = 'print-picking-sheet';
-      const heading = document.createElement('h1'); heading.className = 'picking-print-title'; heading.textContent = title; container.appendChild(heading);
-      const meta = document.createElement('div'); meta.className = 'picking-print-meta'; meta.textContent = `Prepared ${new Date().toLocaleString()} · ${items.reduce((sum, item) => sum + validQty(item.qty), 0)} total parts`; container.appendChild(meta);
-      const table = document.createElement('table'); table.className = 'picking-print-table';
-      const thead = document.createElement('thead'); const hr = document.createElement('tr');
-      ['Collected','Part Number','Description','Location','Qty'].forEach(label => { const th=document.createElement('th'); th.textContent=label; hr.appendChild(th); }); thead.appendChild(hr); table.appendChild(thead);
-      const tbody = document.createElement('tbody');
-      items.forEach(item => { const tr=document.createElement('tr'); ['☐', item.partNo, item.desc || '', item.loc || '', String(validQty(item.qty))].forEach((value, i) => { const td=document.createElement('td'); td.textContent=value; if(i===0) td.className='check-cell'; tr.appendChild(td); }); tbody.appendChild(tr); });
-      table.appendChild(tbody); container.appendChild(table);
-      requestAnimationFrame(() => requestAnimationFrame(() => { try { window.print(); } catch(e) { showNotification('Unable to open print dialog.'); } }));
-      setTimeout(() => { container.className = ''; }, 500);
-    }
 
   </script>
 </body>
