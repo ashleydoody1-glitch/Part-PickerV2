@@ -61,6 +61,7 @@
       label { font-weight: 600; display: block; margin-bottom: 6px; font-size: 13px; color: #555; }
       
       .input-row-top { display: flex; gap: 8px; margin-bottom: 16px; align-items: flex-end; }
+    .inline-scan-btn{width:72px;min-height:46px;justify-content:center;padding:10px 8px;margin:0;flex:none;}
       .part-col { flex-grow: 1; }
       .loc-col { width: 130px; flex-shrink: 0; }
 
@@ -264,11 +265,16 @@
     #carousel-barcode-svg{max-width:100%;height:auto}
     @media(max-width:480px){.app-container{padding:12px!important}.brand h1{font-size:23px}.input-row-top{gap:8px}.mobile-core-actions{gap:8px}.mobile-core-actions .quick-action{padding:10px 7px}.mobile-workflow-hint{font-size:13px}.mobile-show-barcode{position:sticky;bottom:8px;z-index:3}}
 
-  
-    /* Use normal title-style button labels; avoid forcing all letters to uppercase. */
+    /* Saved Job Cards / Template Groups / Scan History swipe area */
+    .saved-sections-swipe{overflow:hidden;margin-top:18px;border-radius:16px;touch-action:pan-y;}
+    .saved-sections-track{display:flex;width:300%;transition:transform .25s ease;will-change:transform;}
+    .saved-section-slide{width:33.333333%;flex:0 0 33.333333%;box-sizing:border-box;padding:0 1px;}
+    .saved-section-slide .groups-section{margin-top:0;}
+    .saved-section-tabs{display:flex;gap:8px;margin:0 0 8px;}
+    .saved-section-tab{flex:1;border:1px solid #cbd8e5;background:#fff;color:#526477;border-radius:9px;padding:8px;font-size:12px;font-weight:700;cursor:pointer;}
+    .saved-section-tab.active{background:#0b5cab;color:#fff;border-color:#0b5cab;}.setting-row{display:flex;align-items:flex-start;gap:10px;padding:11px 0;border-bottom:1px solid #e5ebf1;cursor:pointer}.setting-row:last-of-type{border-bottom:0}.setting-row input{margin-top:3px;width:20px;height:20px}.setting-row span{display:flex;flex-direction:column;gap:3px}.setting-row small{color:#667788;font-size:12px;line-height:1.35}.simple-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:10002;align-items:center;justify-content:center;padding:18px;box-sizing:border-box}.active-list-stats{font-size:12px;color:#647588;margin:-14px 0 10px}.scan-success-flash{animation:scanFlash .45s ease}@keyframes scanFlash{0%{transform:scale(1)}50%{transform:scale(1.015)}100%{transform:scale(1)}}
+    .workflow-label{margin:18px 0 8px;font-size:13px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#526477}
 
-
-    .workflow-stage{display:flex;align-items:center;gap:10px;margin:10px 0 8px;color:#31516f}.workflow-stage>span{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:var(--primary);color:#fff;font-weight:800}.workflow-stage strong{display:block;font-size:14px}.workflow-stage small{display:block;color:#6a7b8c;font-size:12px;margin-top:2px}.stage-booking{margin-top:16px}.setting-row{display:flex;align-items:flex-start;gap:10px;padding:11px 0;border-bottom:1px solid #e5ebf1;cursor:pointer}.setting-row:last-of-type{border-bottom:0}.setting-row input{margin-top:3px;width:20px;height:20px}.setting-row span{display:flex;flex-direction:column;gap:3px}.setting-row small{color:#667788;font-size:12px;line-height:1.35}.simple-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:10002;align-items:center;justify-content:center;padding:18px;box-sizing:border-box}.active-list-stats{font-size:12px;color:#647588;margin:-14px 0 10px}.scan-success-flash{animation:scanFlash .45s ease}@keyframes scanFlash{0%{transform:scale(1)}50%{transform:scale(1.015)}100%{transform:scale(1)}}
 
 </style>
 </head>
@@ -446,8 +452,7 @@
     <div class="brand"><div class="brand-mark">PP</div><div><h1>Part Picker</h1><p>Parts collation, saved sets and barcode prep</p></div></div>
     
     <!-- MOBILE-FIRST CORE ACTIONS: scan a shelf label, build a list, show generated barcodes -->
-    <div class="quick-grid mobile-core-actions">
-      <button class="quick-action quick-primary" onclick="startScanner()"><span class="svg-icon"><svg viewBox="0 0 24 24"><path d="M3 5v14M6 5v14M9 5v14M13 5v14M16 5v14M19 5v14M22 5v14"></path></svg></span>Scan shelf barcode</button>
+    <div class="quick-grid mobile-core-actions" style="grid-template-columns:1fr;">
       <button class="quick-action" onclick="openSearchModal()"><span class="svg-icon"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6"></circle><path d="m16 16 5 5"></path></svg></span>Find a part</button>
     </div>
     <details class="mobile-tools">
@@ -463,7 +468,7 @@
     </details>
     <input id="backup-file-input" type="file" accept="application/json,.json" style="display:none" onchange="importBackupFile(event)">
     
-    <div class="workflow-stage"><span>1</span><div><strong>Collect Parts</strong><small>Scan shelf labels and build your list</small></div></div>
+    <div class="workflow-label">Scan</div>
     <div class="input-card" id="input-card">
       <!-- Top Row: Part Number and optional shelf location -->
       <div class="input-row-top">
@@ -475,6 +480,7 @@
           <label for="loc">Shelf location (optional)</label>
           <input type="text" id="loc" placeholder="" maxlength="10">
         </div>
+        <button class="quick-action quick-primary inline-scan-btn" type="button" onclick="startScanner()" aria-label="Scan shelf barcode">Scan</button>
       </div>
       
       <!-- Second Row: Item Description (Large Box) -->
@@ -500,7 +506,7 @@
     </div>
 
     <!-- Active List Section -->
-    <div class="workflow-stage stage-review"><span>2</span><div><strong>Review</strong><small>Check the parts before generating barcodes</small></div></div>
+    <div class="workflow-label">Review</div>
     <div class="list-header">
       <span>Active Scan List</span>
       <span style="background: var(--primary); color: white; padding: 2px 8px; border-radius: 12px; font-size: 14px;" id="count-badge">0</span>
@@ -532,15 +538,23 @@
       <button class="btn btn-clear" onclick="clearAllLabels()">Clear Active List</button>
     </div>
 
-    <div id="booking-stage" class="workflow-stage stage-booking" style="display:none"><span>3</span><div><strong>Book Out</strong><small>Show the generated barcode on your phone and scan it at the booking-out computer</small></div></div>
+    <div class="workflow-label saved-label">Saved</div>
 
-    <!-- Job Cards Section (Collapsible) -->
+    <!-- Saved Job Cards / Template Groups: swipe between sections -->
+    <div class="saved-sections-swipe" id="saved-sections-swipe">
+      <div class="saved-section-tabs">
+        <button class="saved-section-tab active" id="saved-tab-jobs" onclick="showSavedSection(0)">Job Cards</button>
+        <button class="saved-section-tab" id="saved-tab-groups" onclick="showSavedSection(1)">Template Groups</button>
+        <button class="saved-section-tab" id="saved-tab-history" onclick="showSavedSection(2)">Scan History</button>
+      </div>
+      <div class="saved-sections-track" id="saved-sections-track">
+        <div class="saved-section-slide">
     <div class="groups-section job-section" id="jobs-section" style="display: none;">
-      <div class="list-header" style="margin-top:0; display:flex; justify-content:space-between; align-items:center; cursor: pointer;" onclick="toggleJobs()">
+      <div class="list-header" style="margin-top:0; display:flex; justify-content:space-between; align-items:center;">
         <span id="jobs-title-text">My Saved Job Cards </span>
         <span style="background: var(--info); color: white; padding: 2px 8px; border-radius: 12px; font-size: 14px;" id="jobs-count-badge">0</span>
       </div>
-      <div class="scanned-list" id="jobs-list-container" style="display: none; background: transparent; box-shadow: none; margin-bottom: 0;">
+      <div class="scanned-list" id="jobs-list-container" style="display: block; background: transparent; box-shadow: none; margin-bottom: 0;">
         <div id="jobs-list">
           <!-- Job Cards render here -->
         </div>
@@ -548,14 +562,16 @@
     </div>
 
     <!-- Saved Template Groups Section (Collapsible) -->
+        </div>
+        <div class="saved-section-slide">
     <div class="groups-section" id="groups-section" style="display: none;">
       <div class="list-header" style="margin-top:0; display:flex; justify-content:space-between; align-items:center;">
-        <span id="groups-title-text" onclick="toggleGroups()" style="cursor: pointer; flex-grow: 1;">My Template Groups </span>
+        <span id="groups-title-text" style="flex-grow: 1;">My Template Groups </span>
         <div style="display:flex; align-items:center; gap:8px;">
           <span style="background: var(--primary); color: white; padding: 2px 8px; border-radius: 12px; font-size: 14px;" id="groups-count-badge">0</span>
         </div>
       </div>
-      <div class="scanned-list" id="groups-list-container" style="display: none; background: transparent; box-shadow: none; margin-bottom: 0;">
+      <div class="scanned-list" id="groups-list-container" style="display: block; background: transparent; box-shadow: none; margin-bottom: 0;">
         <input type="search" id="group-filter" class="group-filter" placeholder="Filter saved sets by name or part number…" aria-label="Filter saved templates" oninput="filterSavedGroups(this.value)" style="width:100%;box-sizing:border-box;margin:0 0 10px;padding:12px;border:1px solid #cbd8e5;border-radius:10px;font-size:16px;">
         <div id="groups-list">
           <!-- Groups render here -->
@@ -563,17 +579,20 @@
       </div>
     </div>
 
-    <!-- Scan History Section -->
-    <div class="groups-section" id="history-section" style="display: none;">
-      <div class="list-header" style="margin-top:0; display:flex; justify-content:space-between; align-items:center; cursor: pointer;" onclick="toggleHistory()">
-        <span id="history-title-text">Scan History (Last 25) </span>
-        <button class="btn-action remove" onclick="event.stopPropagation(); clearHistory();" style="font-weight:normal; border-color:transparent;">Clear All</button>
-      </div>
-      <div class="scanned-list" id="history-list" style="display: none;">
-        <!-- History renders here -->
+        </div>
+        <div class="saved-section-slide">
+          <div class="groups-section" id="history-section" style="display: none;">
+            <div class="list-header" style="margin-top:0; display:flex; justify-content:space-between; align-items:center;">
+              <span id="history-title-text">Scan History (Last 25) </span>
+              <button class="btn-action remove" onclick="event.stopPropagation(); clearHistory();" style="font-weight:normal; border-color:transparent;">Clear All</button>
+            </div>
+            <div class="scanned-list" id="history-list" style="display: block;">
+              <!-- History renders here -->
+            </div>
+          </div>
+        </div>
       </div>
     </div>
-  </div>
 
   <!-- PRINT UI -->
   <div id="print-layout"></div>
@@ -626,11 +645,8 @@
     let lastLookupPart = "";
     let lastAutoDesc = "";
     let lastAutoLoc = "";
-    let historyExpanded = safeParseStoredValue('historyExpanded', false) === true;
-    let jobsExpanded = safeParseStoredValue('jobsExpanded', false) === true;
-    let groupsExpanded = safeParseStoredValue('groupsExpanded', false) === true;
 
-    const PART_PICKER_BACKUP_KEYS=['savedBarcodeLabels','savedBarcodeGroups','savedJobCards','scanHistoryList','editingContext','historyExpanded','jobsExpanded','groupsExpanded','partPickerSettings'];
+    const PART_PICKER_BACKUP_KEYS=['savedBarcodeLabels','savedBarcodeGroups','savedJobCards','scanHistoryList','editingContext','partPickerSettings'];
     function safeParseStoredValue(key,fallback){try{const v=localStorage.getItem(key);return v===null?fallback:JSON.parse(v)}catch(error){console.error(error);return fallback}}
     function loadAppSettings(){ const raw=safeParseStoredValue(APP_SETTINGS_KEY,{}); if(raw&&typeof raw==='object') appSettings={...appSettings,...raw}; }
     function saveAppSettings(){ persist(APP_SETTINGS_KEY,appSettings); }
@@ -640,8 +656,8 @@
     async function requestWakeLock(){ if(!appSettings.keepScreenAwake || !('wakeLock' in navigator)) return; try{ wakeLock=await navigator.wakeLock.request('screen'); }catch(_){} }
     async function releaseWakeLock(){ if(wakeLock){ try{ await wakeLock.release(); }catch(_){} wakeLock=null; } }
     document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='visible' && document.getElementById('job-modal')?.style.display==='flex' && appSettings.keepScreenAwake) requestWakeLock(); });
-    function exportAllData(){try{const b={app:'Part Picker',backupVersion:1,exportedAt:new Date().toISOString(),data:{savedBarcodeLabels:safeParseStoredValue('savedBarcodeLabels',[]),savedBarcodeGroups:safeParseStoredValue('savedBarcodeGroups',[]),savedJobCards:safeParseStoredValue('savedJobCards',[]),scanHistoryList:safeParseStoredValue('scanHistoryList',[]),editingContext:safeParseStoredValue('editingContext',null),historyExpanded:safeParseStoredValue('historyExpanded',false),jobsExpanded:safeParseStoredValue('jobsExpanded',false),groupsExpanded:safeParseStoredValue('groupsExpanded',false),partPickerSettings:safeParseStoredValue(APP_SETTINGS_KEY,appSettings)}};const blob=new Blob([JSON.stringify(b,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=`part-picker-backup-${new Date().toISOString().replace(/[:.]/g,'-')}.json`;document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url);showNotification('Backup downloaded successfully.')}catch(e){console.error(e);showNotification('Backup failed.')}}
-    function importBackupFile(event){const input=event.target,file=input.files&&input.files[0];input.value='';if(!file)return;if(file.size>10485760)return showNotification('Backup file is too large.');const reader=new FileReader();reader.onerror=()=>showNotification('Could not read that file.');reader.onload=()=>{let d;try{const b=JSON.parse(reader.result);if(!b||!b.data||typeof b.data!=='object')throw new Error('Invalid Part Picker backup.');d=b.data;if(b.app!=='Part Picker'||!Number.isInteger(b.backupVersion)||b.backupVersion!==1)throw new Error('Unsupported backup format or version.');for(const k of ['savedBarcodeLabels','savedBarcodeGroups','savedJobCards','scanHistoryList'])if(!Array.isArray(d[k]))throw new Error(`Backup is missing valid ${k} data.`);for(const k of ['historyExpanded','jobsExpanded','groupsExpanded'])if(d[k]!==undefined&&typeof d[k]!=='boolean')throw new Error(`Invalid ${k} setting.`);if(d.partPickerSettings!==undefined&&(!d.partPickerSettings||typeof d.partPickerSettings!=='object'))throw new Error('Invalid app settings.')}catch(e){showNotification(e.message||'Invalid backup file.');return}const count=(d.savedBarcodeLabels||[]).length+(d.savedBarcodeGroups||[]).length+(d.savedJobCards||[]).length+(d.scanHistoryList||[]).length;showCustomConfirm(`Import this backup? ${count} saved records will replace data in this browser.`,()=>{try{for(const k of PART_PICKER_BACKUP_KEYS)if(Object.prototype.hasOwnProperty.call(d,k))localStorage.setItem(k,JSON.stringify(d[k]));showNotification('Backup imported. Reloading...');setTimeout(()=>location.reload(),700)}catch(e){showNotification('Import failed.')}})};reader.readAsText(file)}
+    function exportAllData(){try{const b={app:'Part Picker',backupVersion:1,exportedAt:new Date().toISOString(),data:{savedBarcodeLabels:safeParseStoredValue('savedBarcodeLabels',[]),savedBarcodeGroups:safeParseStoredValue('savedBarcodeGroups',[]),savedJobCards:safeParseStoredValue('savedJobCards',[]),scanHistoryList:safeParseStoredValue('scanHistoryList',[]),editingContext:safeParseStoredValue('editingContext',null),partPickerSettings:safeParseStoredValue(APP_SETTINGS_KEY,appSettings)}};const blob=new Blob([JSON.stringify(b,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=`part-picker-backup-${new Date().toISOString().replace(/[:.]/g,'-')}.json`;document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url);showNotification('Backup downloaded successfully.')}catch(e){console.error(e);showNotification('Backup failed.')}}
+    function importBackupFile(event){const input=event.target,file=input.files&&input.files[0];input.value='';if(!file)return;if(file.size>10485760)return showNotification('Backup file is too large.');const reader=new FileReader();reader.onerror=()=>showNotification('Could not read that file.');reader.onload=()=>{let d;try{const b=JSON.parse(reader.result);if(!b||!b.data||typeof b.data!=='object')throw new Error('Invalid Part Picker backup.');d=b.data;if(b.app!=='Part Picker'||!Number.isInteger(b.backupVersion)||b.backupVersion!==1)throw new Error('Unsupported backup format or version.');for(const k of ['savedBarcodeLabels','savedBarcodeGroups','savedJobCards','scanHistoryList'])if(!Array.isArray(d[k]))throw new Error(`Backup is missing valid ${k} data.`);if(d.partPickerSettings!==undefined&&(!d.partPickerSettings||typeof d.partPickerSettings!=='object'))throw new Error('Invalid app settings.')}catch(e){showNotification(e.message||'Invalid backup file.');return}const count=(d.savedBarcodeLabels||[]).length+(d.savedBarcodeGroups||[]).length+(d.savedJobCards||[]).length+(d.scanHistoryList||[]).length;showCustomConfirm(`Import this backup? ${count} saved records will replace data in this browser.`,()=>{try{for(const k of PART_PICKER_BACKUP_KEYS)if(Object.prototype.hasOwnProperty.call(d,k))localStorage.setItem(k,JSON.stringify(d[k]));showNotification('Backup imported. Reloading...');setTimeout(()=>location.reload(),700)}catch(e){showNotification('Import failed.')}})};reader.readAsText(file)}
 
     // Toast Notification helper
     function showNotification(msg) {
@@ -731,32 +747,20 @@
       });
     };
 
-    function toggleHistory() {
-      historyExpanded = !historyExpanded;
-      persist('historyExpanded', historyExpanded);
-      const historyList = document.getElementById('history-list');
-      const titleText = document.getElementById('history-title-text');
-      historyList.style.display = historyExpanded ? 'block' : 'none';
-      titleText.innerText = `Scan History (Last 25) ${historyExpanded ? '' : ''}`;
+    let savedSectionIndex = 0;
+    function showSavedSection(index){
+      savedSectionIndex = Math.max(0, Math.min(2, Number(index) || 0));
+      const track = document.getElementById('saved-sections-track');
+      if(track) track.style.transform = `translateX(-${savedSectionIndex * 33.333333}%)`;
+      document.getElementById('saved-tab-jobs')?.classList.toggle('active', savedSectionIndex===0);
+      document.getElementById('saved-tab-groups')?.classList.toggle('active', savedSectionIndex===1);
+      document.getElementById('saved-tab-history')?.classList.toggle('active', savedSectionIndex===2);
     }
-
-    function toggleJobs() {
-      jobsExpanded = !jobsExpanded;
-      persist('jobsExpanded', jobsExpanded);
-      const jobsListContainer = document.getElementById('jobs-list-container');
-      const titleText = document.getElementById('jobs-title-text');
-      jobsListContainer.style.display = jobsExpanded ? 'block' : 'none';
-      titleText.innerText = `My Saved Job Cards ${jobsExpanded ? '' : ''}`;
-    }
-
-    function toggleGroups() {
-      groupsExpanded = !groupsExpanded;
-      persist('groupsExpanded', groupsExpanded);
-      const groupsListContainer = document.getElementById('groups-list-container');
-      const titleText = document.getElementById('groups-title-text');
-      groupsListContainer.style.display = groupsExpanded ? 'block' : 'none';
-      titleText.innerText = `My Template Groups ${groupsExpanded ? '' : ''}`;
-    }
+    (function setupSavedSectionSwipe(){
+      let startX = null;
+      document.addEventListener('touchstart', e=>{ const area=document.getElementById('saved-sections-swipe'); if(area && e.target.closest('#saved-sections-swipe')) startX=e.touches[0].clientX; }, {passive:true});
+      document.addEventListener('touchend', e=>{ if(startX===null)return; const dx=e.changedTouches[0].clientX-startX; startX=null; if(Math.abs(dx)>45) showSavedSection(savedSectionIndex + (dx<0 ? 1 : -1)); }, {passive:true});
+    })();
 
     // --- DATABASE SEARCH MODAL CONTROLS ---
     function openSearchModal() {
@@ -864,15 +868,16 @@
         lastAutoDesc = ''; lastAutoLoc = ''; lastLookupPart = cleanPart;
       }
       if (!cleanPart) return;
-      let foundDesc = '', foundLoc = '';
+      let foundDesc = '', foundLoc = '', foundExisting = false;
       const collections = [scanHistory, ...savedJobs.map(x => x.items || []), ...savedGroups.map(x => x.items || [])];
       for (const collection of collections) {
         const match = collection.find(item => item.partNo === cleanPart);
-        if (match) { if (!foundDesc && match.desc) foundDesc = match.desc; if (!foundLoc && match.loc) foundLoc = match.loc; }
+        if (match) { foundExisting = true; if (!foundDesc && match.desc) foundDesc = match.desc; if (!foundLoc && match.loc) foundLoc = match.loc; }
         if (foundDesc && foundLoc) break;
       }
       if (foundDesc && !descInput.value.trim()) { descInput.value = foundDesc; lastAutoDesc = foundDesc; }
       if (foundLoc && !locInput.value.trim()) { locInput.value = foundLoc; lastAutoLoc = foundLoc; }
+      return foundExisting;
     }
 
     // --- CAMERA SCANNER (With BarcodeDetector for Orange Labels) ---
@@ -896,15 +901,17 @@
           document.getElementById('desc').value = '';
           lastAutoDesc = '';
           lastAutoLoc = '';
-          lookupPartData(cleanText);
+          const knownPart = lookupPartData(cleanText);
           playScanFeedback();
           document.getElementById('input-card').classList.add('scan-success-flash');
           setTimeout(()=>document.getElementById('input-card').classList.remove('scan-success-flash'),500);
-          if(appSettings.autoAddScanned){
+          const hasKnownDetails = Boolean(document.getElementById('desc').value.trim() || document.getElementById('loc').value.trim());
+          if(appSettings.autoAddScanned && (knownPart || hasKnownDetails)){ 
             setTimeout(()=>{ addOrUpdateLabel(true); if(navigator.vibrate && appSettings.scanVibration) navigator.vibrate(50); },120);
           } else {
             document.getElementById('add-btn').scrollIntoView({behavior:'smooth', block:'center'});
             document.getElementById('add-btn').focus({preventScroll:true});
+            if(appSettings.autoAddScanned && !knownPart && !hasKnownDetails) showNotification(`${cleanText} is new — add the details before saving it.`);
           }
         }, () => {});
       } catch (err) {
@@ -1313,7 +1320,6 @@
       switchJobTab(defaultTab);
       document.getElementById('job-modal').style.display = 'flex';
       if(defaultTab === 'barcode') requestWakeLock();
-      updateBookingStage();
     }
 
     function switchJobTab(tabName) {
@@ -1469,7 +1475,6 @@
     }
 
     function openLastUsedGroup(){ const group=savedGroups.find(g=>g.id===lastUsedGroupId); if(!group){ showNotification('No recently used set yet.'); return; } loadTemplateToList(group.id); }
-    function updateBookingStage(){ const el=document.getElementById('booking-stage'); if(el) el.style.display=labels.length?'flex':'none'; }
     function openSettingsModal(){ const m=document.getElementById('settings-modal'); if(m){applySettingsUI();m.style.display='flex';} }
     function closeSettingsModal(){ const m=document.getElementById('settings-modal'); if(m)m.style.display='none'; }
     function saveData() { return persist('savedBarcodeLabels', labels); }
@@ -1483,7 +1488,7 @@
       const banner = document.getElementById('editing-banner');
       
       document.getElementById('count-badge').innerText = labels.reduce((sum, item) => sum + (parseInt(item.qty) || 1), 0);
-      const totalQty=labels.reduce((sum,item)=>sum+validQty(item.qty),0); const uniqueCount=labels.length; let stats=document.getElementById('active-list-stats'); if(!stats){stats=document.createElement('div');stats.id='active-list-stats';stats.className='active-list-stats';document.querySelector('.list-header').after(stats);} stats.textContent=labels.length?`${totalQty} total parts · ${uniqueCount} unique part${uniqueCount===1?'':'s'}`:''; updateBookingStage();
+      const totalQty=labels.reduce((sum,item)=>sum+validQty(item.qty),0); const uniqueCount=labels.length; let stats=document.getElementById('active-list-stats'); if(!stats){stats=document.createElement('div');stats.id='active-list-stats';stats.className='active-list-stats';document.querySelector('.list-header').after(stats);} stats.textContent=labels.length?`${totalQty} total parts · ${uniqueCount} unique part${uniqueCount===1?'':'s'}`:'';
 
       if (contextEditing) {
         banner.style.display = 'flex';
@@ -1545,8 +1550,8 @@
 
       if(savedJobs.length > 0) {
         jobsSection.style.display = 'block';
-        jobsListContainer.style.display = jobsExpanded ? 'block' : 'none';
-        jobsTitleText.innerText = `My Saved Job Cards ${jobsExpanded ? '' : ''}`;
+        jobsListContainer.style.display = 'block';
+        jobsTitleText.innerText = 'My Saved Job Cards';
         
         jobsList.innerHTML = '';
         savedJobs.forEach(job => {
@@ -1572,10 +1577,11 @@
           `;
         });
       } else {
-        jobsSection.style.display = 'none';
+        jobsSection.style.display = 'block';
+        jobsList.innerHTML = '<div class="empty-state">No job cards saved yet.</div>';
       }
 
-      // Render Template Groups (Collapsible & Persistent State with Load to List)
+      // Render Template Groups
       const groupsSection = document.getElementById('groups-section');
       const groupsList = document.getElementById('groups-list');
       const groupsListContainer = document.getElementById('groups-list-container');
@@ -1583,8 +1589,8 @@
       document.getElementById('groups-count-badge').innerText = savedGroups.length;
 
       groupsSection.style.display = 'block';
-      groupsListContainer.style.display = groupsExpanded ? 'block' : 'none';
-      groupsTitleText.innerText = `My Template Groups ${groupsExpanded ? '' : ''}`;
+      groupsListContainer.style.display = 'block';
+      groupsTitleText.innerText = 'My Template Groups';
 
       if(savedGroups.length > 0) {
         groupsList.innerHTML = '';
@@ -1617,8 +1623,9 @@
       // Scan History
       const historySection = document.getElementById('history-section');
       const historyList = document.getElementById('history-list');
+      historySection.style.display = 'block';
+      historyList.style.display = 'block';
       if(scanHistory.length > 0) {
-        historySection.style.display = 'block';
         historyList.innerHTML = '';
         scanHistory.forEach(hist => {
           const safeDesc = encodeURIComponent(hist.desc || '');
@@ -1637,25 +1644,21 @@
           `;
         });
       } else {
-        historySection.style.display = 'none';
+        historyList.innerHTML = '<div class="empty-state">No scans recorded yet.</div>';
       }
       const savedGroupFilter = document.getElementById('group-filter');
-      if (savedGroupFilter) filterSavedGroups(savedGroupFilter.value, false);
+      if (savedGroupFilter) filterSavedGroups(savedGroupFilter.value);
     }
 
     // Saved-set utilities focused on parts collation, not stock management.
-    function filterSavedGroups(value, expandWhenFiltering = true) {
+    function filterSavedGroups(value) {
       const query = String(value || '').trim().toLowerCase();
       const cards = document.querySelectorAll('#groups-list .group-card');
       cards.forEach(card => {
         const text = (card.dataset.search || card.textContent || '').toLowerCase();
         card.style.display = !query || text.includes(query) ? '' : 'none';
       });
-      if (query && expandWhenFiltering && !groupsExpanded) {
-        groupsExpanded = true;
-        persist('groupsExpanded', true);
-        document.getElementById('groups-list-container').style.display = 'block';
-      }
+
     }
 
     function toggleGroupFavorite(groupId){ const group=savedGroups.find(g=>g.id===groupId); if(!group)return; group.favorite=!group.favorite; saveGroupsData(); renderUI(); showNotification(group.favorite?'Added to favourites.':'Removed from favourites.'); }
@@ -1669,7 +1672,6 @@
       const copy = {id: 'group_' + Date.now().toString(), name: name.trim().toUpperCase(), items: group.items.map(item => ({partNo:item.partNo, desc:item.desc || '', loc:item.loc || '', qty:validQty(item.qty), oos:false}))};
       savedGroups.unshift(copy);
       if (!saveGroupsData()) return;
-      groupsExpanded = true; persist('groupsExpanded', true);
       renderUI();
       showNotification(`Duplicated set as "${copy.name}".`);
     }
